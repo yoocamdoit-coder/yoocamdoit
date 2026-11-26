@@ -1,0 +1,277 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="google" content="notranslate">
+<meta name="description" content="yoo is a director of photography based in Seoul. Commercial and personal work.">
+<meta name="theme-color" content="#151611">
+<title>yoocamdoit — yoo, Director of Photography in Seoul</title>
+<style>:root {
+  color-scheme: dark;
+  --ink: #eeece5;
+  --muted: #aaa99f;
+  --line: #363732;
+  --bg: #151611;
+  --sans: "Helvetica Neue", "Segoe UI Variable Display", "Segoe UI", Arial, sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  font: 13px/1.55 var(--sans);
+  font-weight: 350;
+}
+*,*::before,*::after { box-sizing: border-box; }
+body { margin: 0; }
+a { color: inherit; text-decoration: none; }
+a:focus-visible, button:focus-visible { outline: 2px solid #dad7be; outline-offset: 5px; }
+[hidden] { display: none !important; }
+.shell { width: 100%; margin: 0; }
+.out span { margin-left: .45em; }
+.out:hover { text-decoration: underline; text-underline-offset: 4px; }
+.skip { position: fixed; z-index: 3; top: 1rem; left: 1rem; background: var(--bg); padding: .7rem; transform: translateY(-170%); }
+.skip:focus { transform: none; }
+.home { width: 100%; }
+.folder-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); grid-template-rows: repeat(2,minmax(0,1fr)); gap: 1px; min-height: max(380px, calc(100svh - 76px)); }
+.folder-tile { display: block; min-width: 0; position: relative; isolation: isolate; overflow: hidden; background: #24251f; }
+.folder-tile::after { content: ""; position: absolute; inset: 0; background: #08090755; pointer-events: none; }
+.folder-tile img { position: absolute; inset: 0; display: block; width: 100%; height: 100%; object-fit: cover; }
+.folder-tile:hover img { transform: scale(1.02); }
+@media (prefers-reduced-motion: no-preference) {
+  .folder-tile img { transition: transform 220ms ease; }
+}
+.folder-tile:focus-visible { outline-offset: -4px; }
+.folder-label { position: absolute; z-index: 1; inset: 0; display: grid; align-content: center; justify-items: center; gap: 2px; padding: 6px; text-align: center; color: #fff; font: 350 clamp(13px,1.38vw,19px)/1.2 var(--sans); letter-spacing: -.01em; text-shadow: 0 1px 10px #000, 0 1px 4px #000; }
+.folder-label time { font-size: .72em; }
+.folder-view, .detail { width: 100%; }
+.folder-view { padding: 30px 0 55px; }
+.folder-view h1 { margin: 0 0 18px; font: 500 clamp(24px,4vw,42px)/1.13 var(--sans); }
+.folder-back { width: 100%; margin: 0; padding: 14px 0 44px; }
+@media (max-width: 520px) { .folder-grid { min-height: max(360px, calc(100svh - 69px)); } }
+.detail { padding: 18px 0 46px; }
+.detail + .detail:not([hidden]) { margin-top: 24px; border-top: 1px solid var(--line); }
+.detail-head { margin: 0 0 13px; }
+.detail-head p { color: var(--muted); margin: 0 0 6px; font-size: 13px; }
+.detail-head h2 { margin: 0; font: 400 clamp(16px,2vw,24px)/1.2 var(--sans); letter-spacing: -.02em; overflow-wrap: anywhere; }
+.detail .subtitle { margin: 9px 0 0; color: var(--ink); }
+.player { margin: 0; background: #0b0b09; }
+.player video { display: block; width: 100%; border: 0; }
+.player video { aspect-ratio: 16/9; object-fit: contain; }
+.out { display: inline-block; margin: 9px 0 0; font-size: 12px; color: var(--muted); }
+.detail-section { margin: clamp(31px,6vw,73px) 0 0; }
+.detail-section h2 { border-top: 1px solid var(--line); padding: 11px 0 0; margin: 0 0 15px; font-size: 13px; font-weight: 500; }
+.stills { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 1px; }
+.stills figure { margin: 0; background: #0b0b09; }
+.stills img { display: block; width: 100%; height: auto; aspect-ratio: 16/9; object-fit: contain; }
+.missing { color: var(--muted); font-size: 13px; }
+@media (max-width: 900px) {
+}
+@media (max-width: 520px) {
+  .stills { grid-template-columns: 1fr; }
+}
+.folder-layout { display: grid; grid-template-columns: clamp(118px, 14vw, 208px) minmax(0, 1fr); align-items: start; }
+.project-sidebar { position: sticky; top: 0; padding: 16px 10px 12px 12px; }
+.project-list { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; }
+.project-list a { display: block; padding: 5px 0; color: var(--muted); font-size: 12px; line-height: 1.35; }
+.project-list a:hover, .project-list a[aria-current] { color: var(--ink); text-decoration: underline; text-underline-offset: 4px; }
+.project-stream { min-width: 0; }
+.folder-view:not([hidden]) { padding-inline: 12px; }
+.detail-head, .credits, .project-stream .detail > .out, .folder-back { padding-inline: 12px; }
+@media (max-width: 650px) {
+  .folder-layout { display: block; }
+  .project-sidebar { z-index: 2; padding: 6px 12px; background: var(--bg); border-bottom: 1px solid var(--line); }
+  .project-list { flex-direction: row; align-items: baseline; flex-wrap: wrap; gap: 0 16px; }
+  .detail { scroll-margin-top: 50px; }
+}
+.masthead { display: grid; grid-template-columns: minmax(0,1fr) auto minmax(0,1fr); row-gap: 4px; padding: 13px 13px 11px; align-items: baseline; }
+.site-name { grid-column: 1; grid-row: 1; justify-self: start; font-size: 26px; font-weight: 380; letter-spacing: -.045em; line-height: 1.05; }
+.site-nav { grid-column: 2; grid-row: 1; display: flex; align-items: baseline; gap: clamp(14px,3vw,43px); font-size: 15px; letter-spacing: .02em; }
+.site-nav a { color: var(--muted); }
+.site-nav a[aria-current], .site-nav a:hover { color: var(--ink); text-decoration: underline; text-underline-offset: 4px; text-decoration-thickness: 1px; }
+.site-byline { grid-column: 1 / -1; grid-row: 2; margin: 0; font-size: 13px; color: var(--muted); }
+.contact-view { width: min(650px,100%); margin: clamp(62px,14vh,170px) auto 70px; padding-inline: 16px; }
+.contact-view h1 { margin: 0 0 23px; font-size: clamp(24px,4vw,44px); font-weight: 330; letter-spacing: -.035em; line-height: 1.07; }
+.contact-qr { display: block; width: fit-content; margin-top: 24px; }
+.contact-qr img { display: block; width: 120px; height: 120px; }
+.contact-details { margin: 0; border-top: 1px solid var(--line); }
+.contact-details div { display: grid; grid-template-columns: minmax(62px,1fr) minmax(0,2fr); padding: 13px 0; border-bottom: 1px solid var(--line); gap: 10px; }
+.contact-details dt { color: var(--muted); }
+.contact-details dd { margin: 0; overflow-wrap: anywhere; }
+.contact-details a:hover { text-decoration: underline; text-underline-offset: 4px; }
+@media (max-width: 520px) { .masthead { padding-inline: 9px; } .site-name { font-size: 21px; } .site-nav { font-size: 13px; } .site-byline { font-size: 12px; } }
+
+.site-name { font-weight: 650; }
+.site-nav a[aria-current], .project-list a[aria-current] { font-weight: 650; }
+.folder-label { font-weight: 620; }
+.folder-label time { font-weight: 400; }
+.contact-details dt { font-weight: 600; }
+.detail-head { margin: clamp(24px,4vw,49px) 0 0; padding-inline: 12px; }
+.detail-head h2 { font-weight: 650; }
+.detail-head .project-artist { margin: 5px 0 0; font-weight: 500; }
+.detail > .credits { margin-top: 19px; }
+.detail > .credits h3 { margin: 0 0 8px; font-size: 12px; font-weight: 650; }
+.credit-lines { overflow-wrap: anywhere; }
+.credit-line { display: grid; grid-template-columns: min(35%, 11rem) minmax(0, 1fr); column-gap: 1rem; align-items: baseline; margin: 0 0 3px; }
+.credit-role { font-weight: 600; }
+
+.folder-locked { cursor: default; }
+.folder-locked img { filter: saturate(.35) brightness(.56); }
+.folder-locked:hover img { transform: none; }
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="masthead">
+  <a class="site-name" id="site-name" href="#work" tabindex="0">yoocamdoit</a>
+  <nav class="site-nav" aria-label="Main navigation">
+    <a href="#work" aria-current="page">Home</a>
+    <a href="#contact">Contact</a>
+  </nav>
+  <p class="site-byline">Gwanyeol Yoo, Seoul based Director of Photography</p>
+</header>
+<main id="main" class="shell">
+<section class="home" id="work" aria-label="Work">
+<nav class="folder-grid" aria-label="Work folders">
+  <div class="folder-tile folder-locked" aria-disabled="true"><span class="folder-label"><time datetime="2027">2027</time>Commercial</span></div>
+  <div class="folder-tile folder-locked" aria-disabled="true"><span class="folder-label"><time datetime="2027">2027</time>Personal Work</span></div>
+  <a class="folder-tile" href="#commercial"><img src="./media/run-alone-still-3.webp" alt="" decoding="async"><span class="folder-label"><time datetime="2026">2026</time>Commercial</span></a>
+  <a class="folder-tile" href="#personal"><img src="./media/victor-still-4.webp" alt="" decoding="async"><span class="folder-label"><time datetime="2026">2026</time>Personal Work</span></a>
+</nav>
+</section>
+<section class="folder-view" id="commercial" hidden aria-labelledby="commercial-title" data-title="2026 Commercial">
+<h1 id="commercial-title" tabindex="-1">2026 Commercial</h1>
+</section>
+<section class="folder-view" id="personal" hidden aria-labelledby="personal-title" data-title="2026 Personal Work">
+<h1 id="personal-title" tabindex="-1">2026 Personal Work</h1>
+</section>
+<div class="folder-layout" hidden>
+<aside class="project-sidebar" aria-label="Project index">
+<nav class="project-list" data-folder="commercial" aria-label="Commercial projects" hidden>
+  <a href="#run-alone">Run Alone, But Never Alone</a>
+  <a href="#rum-summer">Rum Summer</a>
+  <a href="#hui-switch">WHO IS ME : SWITCH Opening VCR</a>
+</nav>
+<nav class="project-list" data-folder="personal" aria-label="Personal work projects" hidden>
+  <a href="#howfar">HOWFAR</a>
+  <a href="#victor">Victor</a>
+  <a href="#gone-and-again">Gone, and again</a>
+</nav>
+</aside>
+<div class="project-stream">
+<article class="detail" id="run-alone" data-folder="commercial" hidden aria-labelledby="run-alone-title" data-title="Run Alone, But Never Alone">
+<div class="player" aria-label="Film"><video controls playsinline preload="none" poster="./media/run-alone-thumbnail.jpg" data-source="./media/run-alone.mp4" aria-label="Run Alone, But Never Alone"></video></div>
+<section class="detail-section" aria-label="Film images"><div class="stills"><figure><img src="./media/run-alone-still-1.webp" alt="A dancer seen through a blue-lit opening" width="1920" height="1080" loading="lazy" decoding="async"></figure><figure><img src="./media/run-alone-still-2.webp" alt="Two dancers face to face in warm light" width="1920" height="1080" loading="lazy" decoding="async"></figure><figure><img src="./media/run-alone-still-3.webp" alt="A close-up of a man holding an oxygen mask" width="1920" height="1080" loading="lazy" decoding="async"></figure><figure><img src="./media/run-alone-still-4.webp" alt="An overhead view of a group performance" width="1920" height="1080" loading="lazy" decoding="async"></figure></div></section>
+<div class="detail-head"><h2 id="run-alone-title" tabindex="-1">Run Alone, But Never Alone</h2><p class="project-artist">Kooyoung Back</p></div>
+<section class="detail-section credits" aria-labelledby="run-alone-credits"><h3 id="run-alone-credits">Credits</h3><div class="credit-lines"><div class="credit-line"><span class="credit-role">Director</span>SEUNGMIN YIM, KOOYOUNG BACK</div><div class="credit-line"><span class="credit-role">1st AD</span>MISEONG KIM</div><div class="credit-line"><span class="credit-role">2nd AD</span>TYLER</div><div class="credit-line"><span class="credit-role">Producer</span>YUNJUNG KIM, JIYEON HONG</div><div class="credit-line"><span class="credit-role">PA</span>MINGYU PARK, YONGBAE KIM</div><div class="credit-line"><span class="credit-role">DOP</span>GWANYEOL YOO</div><div class="credit-line"><span class="credit-role">1st AC</span>HYUNJI KIM</div><div class="credit-line"><span class="credit-role">2nd AC</span>YUNTAE GO</div><div class="credit-line"><span class="credit-role">3rd AC</span>TAEMIN WOO</div><div class="credit-line"><span class="credit-role">Gaffer</span>JAEYOUNG HAN</div><div class="credit-line"><span class="credit-role">Best Boy</span>DOOHYUN HAN</div><div class="credit-line"><span class="credit-role">2nd</span>JIN NAMGOONG</div><div class="credit-line"><span class="credit-role">3rd</span>DONGYEON KIM, SUNGHYUN JOO</div><div class="credit-line"><span class="credit-role">Art Director</span>MINGEE KIM</div><div class="credit-line"><span class="credit-role">Art Team</span>NAYOUNG KIM, JISU CHOI, WOOHYEON LEE</div><div class="credit-line"><span class="credit-role">Set Builder</span>DABIN CHEON, JONGWOOK PARK</div><div class="credit-line"><span class="credit-role">Edit</span>SEUNGMIN YIM</div><div class="credit-line"><span class="credit-role">DI</span>MINJAE KIM (SQUARE COLOR)</div><div class="credit-line"><span class="credit-role">AI VFX</span>HYEONSEONG LEE</div><div class="credit-line"><span class="credit-role">Sound Mixer</span>JUNHYEONG JEON</div></div></section>
+
+</article>
+<article class="detail" id="rum-summer" data-folder="commercial" hidden aria-labelledby="rum-summer-title" data-title="Rum Summer">
+<div class="player" aria-label="Film"><video controls playsinline preload="none" poster="./media/rum-summer-thumbnail.jpg" data-source="./media/rum-summer.mp4" aria-label="Rum Summer"></video></div>
+<section class="detail-section" aria-label="Film images"><div class="stills"><figure><img src="./media/rum-summer-still-1.webp" alt="Kwon Sojeong in profile beside a stairwell" width="1920" height="1080" loading="lazy" decoding="async"></figure><figure><img src="./media/rum-summer-still-2.webp" alt="A black-and-white walkway beneath a structure" width="1920" height="1080" loading="lazy" decoding="async"></figure><figure><img src="./media/rum-summer-still-3.webp" alt="Two figures running across a field near a wind turbine" width="1920" height="1080" loading="lazy" decoding="async"></figure><figure><img src="./media/rum-summer-still-4.webp" alt="A figure on a beach under a blue evening sky" width="1920" height="1080" loading="lazy" decoding="async"></figure></div></section>
+<div class="detail-head"><h2 id="rum-summer-title" tabindex="-1">Rum Summer</h2><p class="project-artist">Kwon Sojeong</p></div>
+<section class="detail-section credits" aria-labelledby="rum-summer-credits"><h3 id="rum-summer-credits">Credits</h3><div class="credit-lines"><div class="credit-line"><span class="credit-role">Starring</span>SOJEONG KWON, BYEONGGYU JO</div><div class="credit-line"><span class="credit-role">Director</span>JAEHUN LEE</div><div class="credit-line"><span class="credit-role">AD</span>YOUNGHEE SHIN</div><div class="credit-line"><span class="credit-role">Producer</span>SANGGI NAMGUNG</div><div class="credit-line"><span class="credit-role">Production Department</span>YOUNGDAE KIM, JUWON KIM</div><div class="credit-line"><span class="credit-role">DOP</span>GWANYEOL YOO</div><div class="credit-line"><span class="credit-role">1st AC</span>JINHYEOK KIM, INWOO SONG</div><div class="credit-line"><span class="credit-role">2nd AC</span>SUNGU KIM, JEONGWOO MAENG</div><div class="credit-line"><span class="credit-role">3rd AC</span>WONGEUN JEONG</div><div class="credit-line"><span class="credit-role">DIT</span>MIYOUNG JEONG, SEUNGMIN YIM</div><div class="credit-line"><span class="credit-role">Camcorder</span>HAZEL KWON, SUMIN JO</div><div class="credit-line"><span class="credit-role">Styling</span>ezyna</div><div class="credit-line"><span class="credit-role">Hair</span>KWON SUBIN</div><div class="credit-line"><span class="credit-role">Make up</span>JANG CHAE RIN</div><div class="credit-line"><span class="credit-role">Edit</span>JAEHUN LEE</div><div class="credit-line"><span class="credit-role">Color</span>MINJAE KIM (Square Color)</div><div class="credit-line"><span class="credit-role">Beauty Cleaning</span>MINJAE KIM (Square Color)</div><div class="credit-line"><span class="credit-role">2D Cleaning</span>HYUNJOO LEE</div><div class="credit-line"><span class="credit-role">VFX</span>KIHOON HONG</div><div class="credit-line"><span class="credit-role">AI Artworks</span>KIHOON HONG, JONGHYEON MUN</div><div class="credit-line"><span class="credit-role">Sound Design</span>WONBIN SEO</div><div class="credit-line"><span class="credit-role">Thanks to</span>Jang Sungkyun, Lee Yoohyun</div></div></section>
+
+</article>
+<article class="detail" id="hui-switch" data-folder="commercial" hidden aria-labelledby="hui-switch-title" data-title="WHO IS ME : SWITCH">
+<div class="player" aria-label="Film"><video controls playsinline preload="none" poster="./media/hui-switch-thumbnail.jpg" data-source="./media/hui-switch.mp4" aria-label="WHO IS ME : SWITCH"></video></div>
+<section class="detail-section" aria-label="Film images"><div class="stills"><figure><img src="./media/hui-switch-still-1.webp" alt="HUI in front of a wall of posters" width="1920" height="1080" loading="lazy" decoding="async"></figure><figure><img src="./media/hui-switch-still-2.webp" alt="A collage of posters on a wall" width="1920" height="1080" loading="lazy" decoding="async"></figure><figure><img src="./media/hui-switch-still-3.webp" alt="Hands holding a red apple" width="1920" height="1080" loading="lazy" decoding="async"></figure><figure><img src="./media/hui-switch-still-4.webp" alt="HUI reading on a sofa in warm light" width="1920" height="1080" loading="lazy" decoding="async"></figure></div></section>
+<div class="detail-head"><h2 id="hui-switch-title" tabindex="-1">WHO IS ME : SWITCH Opening VCR</h2><p class="project-artist">HUI</p></div>
+<section class="detail-section credits" aria-labelledby="hui-switch-credits"><h3 id="hui-switch-credits">Credits</h3><div class="credit-lines"><div class="credit-line"><span class="credit-role">Artist</span>HUI (PENTAGON)</div><div class="credit-line"><span class="credit-role">Director</span>Lim Seungmin</div><div class="credit-line"><span class="credit-role">Production Producer</span>Kim Miseong</div><div class="credit-line"><span class="credit-role">Production Assistant</span>Kim Donggyu</div><div class="credit-line"><span class="credit-role">DOP</span>Yoo Gwanyeol</div><div class="credit-line"><span class="credit-role">1st AC</span>Shin Seungyong</div><div class="credit-line"><span class="credit-role">2nd AC</span>Han Jiseong</div><div class="credit-line"><span class="credit-role">3rd AC</span>Kim Jinhyeok, Lee Woohyeon</div><div class="credit-line"><span class="credit-role">DIT</span>Han Jiseong</div><div class="credit-line"><span class="credit-role">Gaffer</span>Kim Wansoo</div><div class="credit-line"><span class="credit-role">1st</span>Choi Yejun</div><div class="credit-line"><span class="credit-role">Art Director</span>Kim Mingee</div><div class="credit-line"><span class="credit-role">Art Team Deginer</span>Kim Mingee, Kim Nayoung, Choi Jisu</div><div class="credit-line"><span class="credit-role">Art Team</span>Kim Nayoung, Choi Jisu, Gwon Iji</div><div class="credit-line"><span class="credit-role">Hair</span>Kim Minju</div><div class="credit-line"><span class="credit-role">Make-Up</span>Kim Minju</div><div class="credit-line"><span class="credit-role">Production Sound Mixer</span>Choi Siyeong</div><div class="credit-line"><span class="credit-role">Boom Operator</span>Park Jiseon</div><div class="credit-line"><span class="credit-role">Edit</span>Lim Seungmin</div><div class="credit-line"><span class="credit-role">DI Colorist</span>Kim Minjae (Square Color)</div></div></section>
+
+</article>
+<article class="detail" id="howfar" data-folder="personal" hidden aria-labelledby="howfar-title" data-title="HOWFAR">
+<div class="player" aria-label="Film"><video controls playsinline preload="none" poster="./media/howfar-thumbnail.jpg" data-source="./media/howfar.mp4" aria-label="HOWFAR"></video></div>
+<section class="detail-section" aria-label="Film images"><div class="stills"><figure><img src="./media/howfar-still-1.webp" alt="A singer with a microphone in a warmly lit room" width="1920" height="1080" loading="lazy" decoding="async"></figure><figure><img src="./media/howfar-still-3.webp" alt="A singer seated among the band" width="1920" height="1080" loading="lazy" decoding="async"></figure><figure><img src="./media/howfar-still-2.webp" alt="A guitarist in green-tinted light" width="1920" height="1080" loading="lazy" decoding="async"></figure><figure><img src="./media/howfar-still-4.webp" alt="A band performing beneath blue lighting" width="1920" height="1080" loading="lazy" decoding="async"></figure></div></section>
+<div class="detail-head"><h2 id="howfar-title" tabindex="-1">HOWFAR</h2><p class="project-artist">PARKHANEUM</p></div>
+<section class="detail-section credits" aria-labelledby="howfar-credits"><h3 id="howfar-credits">Credits</h3><div class="credit-lines"><div class="credit-line"><span class="credit-role">Artist</span>PARKHANEUM</div><div class="credit-line"><span class="credit-role">Director</span>SEUNGMIN YIM</div><div class="credit-line"><span class="credit-role">1st AD</span>JUNGMIN SONG</div><div class="credit-line"><span class="credit-role">2nd AD</span>HAGYEONG JANG</div><div class="credit-line"><span class="credit-role">Producer</span>MISEONG KIM</div><div class="credit-line"><span class="credit-role">DOP</span>GWANYEOL YOO</div><div class="credit-line"><span class="credit-role">1st AC</span>WOOHYEON LEE</div><div class="credit-line"><span class="credit-role">Gaffer</span>YEJUN CHOI</div><div class="credit-line"><span class="credit-role">Edit</span>SEUNGMIN YIM</div><div class="credit-line"><span class="credit-role">Color</span>SEUNGMIN YIM</div></div></section>
+</article>
+<article class="detail" id="victor" data-folder="personal" hidden aria-labelledby="victor-title" data-title="Victor">
+<div class="player" aria-label="Film"><video controls playsinline preload="none" poster="./media/victor-thumbnail.jpg" data-source="./media/victor.mp4" aria-label="Victor"></video></div>
+<section class="detail-section" aria-label="Film images"><div class="stills"><figure><img src="./media/victor-still-1.webp" alt="Dancers outside a building in black and white" width="1920" height="1080" loading="lazy" decoding="async"></figure><figure><img src="./media/victor-still-2.webp" alt="A group of dancers at the end of a dark hallway" width="1920" height="1080" loading="lazy" decoding="async"></figure><figure><img src="./media/victor-still-3.webp" alt="A hooded dancer framed by hands" width="1920" height="1080" loading="lazy" decoding="async"></figure><figure><img src="./media/victor-still-4.webp" alt="Dancers performing at night beside flames" width="1920" height="1080" loading="lazy" decoding="async"></figure></div></section>
+<div class="detail-head"><h2 id="victor-title" tabindex="-1">Victor</h2><p class="project-artist">AKUA</p></div>
+<section class="detail-section credits" aria-labelledby="victor-credits"><h3 id="victor-credits">Credits</h3><div class="credit-lines"><div class="credit-line"><span class="credit-role">Dancer</span>AKUA, CALEB, DIBO, JSEUKI, SEOJIN, SLASHER, VARTS, YEBBIN, YEJIN, YEONWOO</div><div class="credit-line"><span class="credit-role">Choreography By</span>AKUA</div><div class="credit-line"><span class="credit-role">Director</span>YIM SEUNGMIN</div><div class="credit-line"><span class="credit-role">Assistant Director</span>KIM MISEONG</div><div class="credit-line"><span class="credit-role">Producer</span>NAMGUNG SANGGI</div><div class="credit-line"><span class="credit-role">Production Assistant</span>KIM DONGGYU</div><div class="credit-line"><span class="credit-role">DOP</span>YOO GWANYEOL</div><div class="credit-line"><span class="credit-role">Focus Puller</span>SHIN SEUNGYONG</div><div class="credit-line"><span class="credit-role">Assistant Crew</span>LEE WOOHYEON, KIM DAEYOUNG</div><div class="credit-line"><span class="credit-role">Art Director</span>KIM MINGEE</div><div class="credit-line"><span class="credit-role">Art Team</span>CHOI JISU, KIM NAYOUNG</div><div class="credit-line"><span class="credit-role">Edit</span>YIM SEUNGMIN</div><div class="credit-line"><span class="credit-role">Color</span>YIM SEUNGMIN</div></div></section>
+
+</article>
+<article class="detail" id="gone-and-again" data-folder="personal" hidden aria-labelledby="gone-and-again-title" data-title="Gone, and again">
+<div class="player" aria-label="Film"><video controls playsinline preload="none" poster="./media/gone-and-again-thumbnail.jpg" data-source="./media/gone-and-again.mp4" aria-label="Gone, and again"></video></div>
+<section class="detail-section" aria-label="Film images"><div class="stills"><figure><img src="./media/gone-and-again-still-1.webp" alt="A black-and-white street at night" width="1920" height="1080" loading="lazy" decoding="async"></figure><figure><img src="./media/gone-and-again-still-2.webp" alt="Figures in a dim sitting room" width="1920" height="1080" loading="lazy" decoding="async"></figure><figure><img src="./media/gone-and-again-still-3.webp" alt="A figure in a warm-lit kitchen" width="1920" height="1080" loading="lazy" decoding="async"></figure><figure><img src="./media/gone-and-again-still-4.webp" alt="Two figures crossing a green-lit passage" width="1920" height="1080" loading="lazy" decoding="async"></figure></div></section>
+<div class="detail-head"><h2 id="gone-and-again-title" tabindex="-1">Gone, and again</h2><p class="project-artist">merrimaii</p></div>
+<section class="detail-section credits" aria-labelledby="gone-and-again-credits"><h3 id="gone-and-again-credits">Credits</h3><div class="credit-lines"><div class="credit-line"><span class="credit-role">Dancer</span>Gaeun Mae</div><div class="credit-line"><span class="credit-role">Actor</span>Yoohyeon Lee</div><div class="credit-line"><span class="credit-role">Director</span>Jaehun Lee</div><div class="credit-line"><span class="credit-role">AD</span>Younghee Shin</div><div class="credit-line"><span class="credit-role">PD</span>Sanggi Namgung</div><div class="credit-line"><span class="credit-role">DOP</span>Gwanyeol Yoo</div><div class="credit-line"><span class="credit-role">1st</span>Shin Seungyong</div><div class="credit-line"><span class="credit-role">Gaffer</span>Wansu Kim</div><div class="credit-line"><span class="credit-role">Art</span>Younghee Shin</div><div class="credit-line"><span class="credit-role">D.I.</span>Minjae Kim (Square Color)</div><div class="credit-line"><span class="credit-role">Cleaning</span>Jonghyun Moon</div></div></section>
+
+</article>
+</div>
+</div>
+
+<div class="folder-back" hidden><a class="out" href="#work">← All folders</a></div>
+<section class="contact-view" id="contact" aria-labelledby="contact-title" hidden>
+  <h1 id="contact-title" tabindex="-1">Contact</h1>
+  <dl class="contact-details">
+    <div><dt>Email</dt><dd><a href="mailto:yoocamdoit@gmail.com">yoocamdoit@gmail.com</a></dd></div>
+    <div><dt>Instagram</dt><dd><a href="https://www.instagram.com/yoocamdoit/" target="_blank" rel="noopener noreferrer">@yoocamdoit</a></dd></div>
+    <div><dt>Agency</dt><dd>Freelance</dd></div>
+    <div><dt>Based in</dt><dd>Seoul, South Korea</dd></div>
+  </dl>
+  <a class="contact-qr" href="https://www.instagram.com/yoocamdoit/" target="_blank" rel="noopener noreferrer"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzNyAzNyIgc2hhcGUtcmVuZGVyaW5nPSJjcmlzcEVkZ2VzIj48cGF0aCBmaWxsPSIjZmZmIiBkPSJNMCAwaDM3djM3SDB6Ii8+PHBhdGggZmlsbD0iIzExMSIgZD0iTTQgNGgxdjFoLTF6TTUgNGgxdjFoLTF6TTYgNGgxdjFoLTF6TTcgNGgxdjFoLTF6TTggNGgxdjFoLTF6TTkgNGgxdjFoLTF6TTEwIDRoMXYxaC0xek0xMyA0aDF2MWgtMXpNMTUgNGgxdjFoLTF6TTE2IDRoMXYxaC0xek0xNyA0aDF2MWgtMXpNMTggNGgxdjFoLTF6TTE5IDRoMXYxaC0xek0yMCA0aDF2MWgtMXpNMjIgNGgxdjFoLTF6TTIzIDRoMXYxaC0xek0yNiA0aDF2MWgtMXpNMjcgNGgxdjFoLTF6TTI4IDRoMXYxaC0xek0yOSA0aDF2MWgtMXpNMzAgNGgxdjFoLTF6TTMxIDRoMXYxaC0xek0zMiA0aDF2MWgtMXpNNCA1aDF2MWgtMXpNMTAgNWgxdjFoLTF6TTEyIDVoMXYxaC0xek0xNSA1aDF2MWgtMXpNMTggNWgxdjFoLTF6TTE5IDVoMXYxaC0xek0yMyA1aDF2MWgtMXpNMjYgNWgxdjFoLTF6TTMyIDVoMXYxaC0xek00IDZoMXYxaC0xek02IDZoMXYxaC0xek03IDZoMXYxaC0xek04IDZoMXYxaC0xek0xMCA2aDF2MWgtMXpNMTMgNmgxdjFoLTF6TTE0IDZoMXYxaC0xek0yMyA2aDF2MWgtMXpNMjYgNmgxdjFoLTF6TTI4IDZoMXYxaC0xek0yOSA2aDF2MWgtMXpNMzAgNmgxdjFoLTF6TTMyIDZoMXYxaC0xek00IDdoMXYxaC0xek02IDdoMXYxaC0xek03IDdoMXYxaC0xek04IDdoMXYxaC0xek0xMCA3aDF2MWgtMXpNMTMgN2gxdjFoLTF6TTE0IDdoMXYxaC0xek0xNyA3aDF2MWgtMXpNMTkgN2gxdjFoLTF6TTIwIDdoMXYxaC0xek0yMiA3aDF2MWgtMXpNMjYgN2gxdjFoLTF6TTI4IDdoMXYxaC0xek0yOSA3aDF2MWgtMXpNMzAgN2gxdjFoLTF6TTMyIDdoMXYxaC0xek00IDhoMXYxaC0xek02IDhoMXYxaC0xek03IDhoMXYxaC0xek04IDhoMXYxaC0xek0xMCA4aDF2MWgtMXpNMTIgOGgxdjFoLTF6TTE0IDhoMXYxaC0xek0xNSA4aDF2MWgtMXpNMTcgOGgxdjFoLTF6TTE4IDhoMXYxaC0xek0xOSA4aDF2MWgtMXpNMjEgOGgxdjFoLTF6TTIyIDhoMXYxaC0xek0yMyA4aDF2MWgtMXpNMjQgOGgxdjFoLTF6TTI2IDhoMXYxaC0xek0yOCA4aDF2MWgtMXpNMjkgOGgxdjFoLTF6TTMwIDhoMXYxaC0xek0zMiA4aDF2MWgtMXpNNCA5aDF2MWgtMXpNMTAgOWgxdjFoLTF6TTE1IDloMXYxaC0xek0xNiA5aDF2MWgtMXpNMTggOWgxdjFoLTF6TTE5IDloMXYxaC0xek0yMCA5aDF2MWgtMXpNMjIgOWgxdjFoLTF6TTIzIDloMXYxaC0xek0yNCA5aDF2MWgtMXpNMjYgOWgxdjFoLTF6TTMyIDloMXYxaC0xek00IDEwaDF2MWgtMXpNNSAxMGgxdjFoLTF6TTYgMTBoMXYxaC0xek03IDEwaDF2MWgtMXpNOCAxMGgxdjFoLTF6TTkgMTBoMXYxaC0xek0xMCAxMGgxdjFoLTF6TTEyIDEwaDF2MWgtMXpNMTQgMTBoMXYxaC0xek0xNiAxMGgxdjFoLTF6TTE4IDEwaDF2MWgtMXpNMjAgMTBoMXYxaC0xek0yMiAxMGgxdjFoLTF6TTI0IDEwaDF2MWgtMXpNMjYgMTBoMXYxaC0xek0yNyAxMGgxdjFoLTF6TTI4IDEwaDF2MWgtMXpNMjkgMTBoMXYxaC0xek0zMCAxMGgxdjFoLTF6TTMxIDEwaDF2MWgtMXpNMzIgMTBoMXYxaC0xek0xNiAxMWgxdjFoLTF6TTE5IDExaDF2MWgtMXpNMjEgMTFoMXYxaC0xek0yMiAxMWgxdjFoLTF6TTIzIDExaDF2MWgtMXpNMjQgMTFoMXYxaC0xek00IDEyaDF2MWgtMXpNNiAxMmgxdjFoLTF6TTggMTJoMXYxaC0xek0xMCAxMmgxdjFoLTF6TTE1IDEyaDF2MWgtMXpNMTkgMTJoMXYxaC0xek0yMCAxMmgxdjFoLTF6TTIxIDEyaDF2MWgtMXpNMjMgMTJoMXYxaC0xek0yNCAxMmgxdjFoLTF6TTI4IDEyaDF2MWgtMXpNMzEgMTJoMXYxaC0xek02IDEzaDF2MWgtMXpNNyAxM2gxdjFoLTF6TTggMTNoMXYxaC0xek0xNCAxM2gxdjFoLTF6TTE3IDEzaDF2MWgtMXpNMjAgMTNoMXYxaC0xek0yNCAxM2gxdjFoLTF6TTI1IDEzaDF2MWgtMXpNMjYgMTNoMXYxaC0xek0yOSAxM2gxdjFoLTF6TTMyIDEzaDF2MWgtMXpNNyAxNGgxdjFoLTF6TTggMTRoMXYxaC0xek0xMCAxNGgxdjFoLTF6TTExIDE0aDF2MWgtMXpNMTMgMTRoMXYxaC0xek0xNSAxNGgxdjFoLTF6TTE4IDE0aDF2MWgtMXpNMzAgMTRoMXYxaC0xek0zMSAxNGgxdjFoLTF6TTMyIDE0aDF2MWgtMXpNNCAxNWgxdjFoLTF6TTkgMTVoMXYxaC0xek0xMiAxNWgxdjFoLTF6TTEzIDE1aDF2MWgtMXpNMTQgMTVoMXYxaC0xek0xNSAxNWgxdjFoLTF6TTE2IDE1aDF2MWgtMXpNMTcgMTVoMXYxaC0xek0xOCAxNWgxdjFoLTF6TTIwIDE1aDF2MWgtMXpNMjEgMTVoMXYxaC0xek0yMiAxNWgxdjFoLTF6TTIzIDE1aDF2MWgtMXpNMjggMTVoMXYxaC0xek0zMSAxNWgxdjFoLTF6TTYgMTZoMXYxaC0xek03IDE2aDF2MWgtMXpNOCAxNmgxdjFoLTF6TTkgMTZoMXYxaC0xek0xMCAxNmgxdjFoLTF6TTExIDE2aDF2MWgtMXpNMTIgMTZoMXYxaC0xek0xNCAxNmgxdjFoLTF6TTE2IDE2aDF2MWgtMXpNMTggMTZoMXYxaC0xek0xOSAxNmgxdjFoLTF6TTIwIDE2aDF2MWgtMXpNMjEgMTZoMXYxaC0xek0yMiAxNmgxdjFoLTF6TTI0IDE2aDF2MWgtMXpNMjUgMTZoMXYxaC0xek0yNiAxNmgxdjFoLTF6TTI5IDE2aDF2MWgtMXpNMzEgMTZoMXYxaC0xek0zMiAxNmgxdjFoLTF6TTQgMTdoMXYxaC0xek02IDE3aDF2MWgtMXpNOCAxN2gxdjFoLTF6TTExIDE3aDF2MWgtMXpNMTIgMTdoMXYxaC0xek0xNCAxN2gxdjFoLTF6TTE1IDE3aDF2MWgtMXpNMTYgMTdoMXYxaC0xek0xOCAxN2gxdjFoLTF6TTIwIDE3aDF2MWgtMXpNMjQgMTdoMXYxaC0xek0yNSAxN2gxdjFoLTF6TTI2IDE3aDF2MWgtMXpNMjcgMTdoMXYxaC0xek0yOSAxN2gxdjFoLTF6TTMyIDE3aDF2MWgtMXpNNSAxOGgxdjFoLTF6TTYgMThoMXYxaC0xek0xMCAxOGgxdjFoLTF6TTEzIDE4aDF2MWgtMXpNMTQgMThoMXYxaC0xek0xNSAxOGgxdjFoLTF6TTE2IDE4aDF2MWgtMXpNMTcgMThoMXYxaC0xek0yMCAxOGgxdjFoLTF6TTIxIDE4aDF2MWgtMXpNMjQgMThoMXYxaC0xek0yNSAxOGgxdjFoLTF6TTI3IDE4aDF2MWgtMXpNMjkgMThoMXYxaC0xek0zMSAxOGgxdjFoLTF6TTMyIDE4aDF2MWgtMXpNNSAxOWgxdjFoLTF6TTcgMTloMXYxaC0xek04IDE5aDF2MWgtMXpNMTEgMTloMXYxaC0xek0xMiAxOWgxdjFoLTF6TTEzIDE5aDF2MWgtMXpNMTYgMTloMXYxaC0xek0xOSAxOWgxdjFoLTF6TTIwIDE5aDF2MWgtMXpNMjEgMTloMXYxaC0xek0yMiAxOWgxdjFoLTF6TTI1IDE5aDF2MWgtMXpNMjYgMTloMXYxaC0xek0yOSAxOWgxdjFoLTF6TTMxIDE5aDF2MWgtMXpNNiAyMGgxdjFoLTF6TTggMjBoMXYxaC0xek05IDIwaDF2MWgtMXpNMTAgMjBoMXYxaC0xek0xMSAyMGgxdjFoLTF6TTEzIDIwaDF2MWgtMXpNMTQgMjBoMXYxaC0xek0yMCAyMGgxdjFoLTF6TTIxIDIwaDF2MWgtMXpNMjUgMjBoMXYxaC0xek0yNiAyMGgxdjFoLTF6TTI3IDIwaDF2MWgtMXpNMjkgMjBoMXYxaC0xek0zMSAyMGgxdjFoLTF6TTMyIDIwaDF2MWgtMXpNNSAyMWgxdjFoLTF6TTEzIDIxaDF2MWgtMXpNMTQgMjFoMXYxaC0xek0xNSAyMWgxdjFoLTF6TTE3IDIxaDF2MWgtMXpNMjAgMjFoMXYxaC0xek0yMiAyMWgxdjFoLTF6TTI0IDIxaDF2MWgtMXpNMjYgMjFoMXYxaC0xek0yOSAyMWgxdjFoLTF6TTMwIDIxaDF2MWgtMXpNMzIgMjFoMXYxaC0xek00IDIyaDF2MWgtMXpNNyAyMmgxdjFoLTF6TTggMjJoMXYxaC0xek0xMCAyMmgxdjFoLTF6TTExIDIyaDF2MWgtMXpNMTUgMjJoMXYxaC0xek0xNiAyMmgxdjFoLTF6TTE4IDIyaDF2MWgtMXpNMjIgMjJoMXYxaC0xek0yNiAyMmgxdjFoLTF6TTI3IDIyaDF2MWgtMXpNMzEgMjJoMXYxaC0xek0zMiAyMmgxdjFoLTF6TTUgMjNoMXYxaC0xek02IDIzaDF2MWgtMXpNNyAyM2gxdjFoLTF6TTggMjNoMXYxaC0xek05IDIzaDF2MWgtMXpNMTEgMjNoMXYxaC0xek0xMyAyM2gxdjFoLTF6TTE0IDIzaDF2MWgtMXpNMTUgMjNoMXYxaC0xek0xNyAyM2gxdjFoLTF6TTE4IDIzaDF2MWgtMXpNMTkgMjNoMXYxaC0xek0yMCAyM2gxdjFoLTF6TTIxIDIzaDF2MWgtMXpNMjIgMjNoMXYxaC0xek0yNCAyM2gxdjFoLTF6TTI2IDIzaDF2MWgtMXpNMjkgMjNoMXYxaC0xek0zMSAyM2gxdjFoLTF6TTQgMjRoMXYxaC0xek02IDI0aDF2MWgtMXpNMTAgMjRoMXYxaC0xek0xMiAyNGgxdjFoLTF6TTE2IDI0aDF2MWgtMXpNMTggMjRoMXYxaC0xek0xOSAyNGgxdjFoLTF6TTIwIDI0aDF2MWgtMXpNMjEgMjRoMXYxaC0xek0yNCAyNGgxdjFoLTF6TTI1IDI0aDF2MWgtMXpNMjYgMjRoMXYxaC0xek0yNyAyNGgxdjFoLTF6TTI4IDI0aDF2MWgtMXpNMTIgMjVoMXYxaC0xek0xMyAyNWgxdjFoLTF6TTE0IDI1aDF2MWgtMXpNMTggMjVoMXYxaC0xek0yMCAyNWgxdjFoLTF6TTIzIDI1aDF2MWgtMXpNMjQgMjVoMXYxaC0xek0yOCAyNWgxdjFoLTF6TTMwIDI1aDF2MWgtMXpNMzEgMjVoMXYxaC0xek0zMiAyNWgxdjFoLTF6TTQgMjZoMXYxaC0xek01IDI2aDF2MWgtMXpNNiAyNmgxdjFoLTF6TTcgMjZoMXYxaC0xek04IDI2aDF2MWgtMXpNOSAyNmgxdjFoLTF6TTEwIDI2aDF2MWgtMXpNMTUgMjZoMXYxaC0xek0xNiAyNmgxdjFoLTF6TTE3IDI2aDF2MWgtMXpNMjEgMjZoMXYxaC0xek0yMyAyNmgxdjFoLTF6TTI0IDI2aDF2MWgtMXpNMjYgMjZoMXYxaC0xek0yOCAyNmgxdjFoLTF6TTI5IDI2aDF2MWgtMXpNMzEgMjZoMXYxaC0xek0zMiAyNmgxdjFoLTF6TTQgMjdoMXYxaC0xek0xMCAyN2gxdjFoLTF6TTEzIDI3aDF2MWgtMXpNMTYgMjdoMXYxaC0xek0xOSAyN2gxdjFoLTF6TTIxIDI3aDF2MWgtMXpNMjIgMjdoMXYxaC0xek0yNCAyN2gxdjFoLTF6TTI4IDI3aDF2MWgtMXpNMjkgMjdoMXYxaC0xek00IDI4aDF2MWgtMXpNNiAyOGgxdjFoLTF6TTcgMjhoMXYxaC0xek04IDI4aDF2MWgtMXpNMTAgMjhoMXYxaC0xek0xMiAyOGgxdjFoLTF6TTE0IDI4aDF2MWgtMXpNMTYgMjhoMXYxaC0xek0yMCAyOGgxdjFoLTF6TTIxIDI4aDF2MWgtMXpNMjQgMjhoMXYxaC0xek0yNSAyOGgxdjFoLTF6TTI2IDI4aDF2MWgtMXpNMjcgMjhoMXYxaC0xek0yOCAyOGgxdjFoLTF6TTMxIDI4aDF2MWgtMXpNMzIgMjhoMXYxaC0xek00IDI5aDF2MWgtMXpNNiAyOWgxdjFoLTF6TTcgMjloMXYxaC0xek04IDI5aDF2MWgtMXpNMTAgMjloMXYxaC0xek0xMyAyOWgxdjFoLTF6TTE1IDI5aDF2MWgtMXpNMTcgMjloMXYxaC0xek0yMCAyOWgxdjFoLTF6TTI4IDI5aDF2MWgtMXpNMzAgMjloMXYxaC0xek0zMSAyOWgxdjFoLTF6TTMyIDI5aDF2MWgtMXpNNCAzMGgxdjFoLTF6TTYgMzBoMXYxaC0xek03IDMwaDF2MWgtMXpNOCAzMGgxdjFoLTF6TTEwIDMwaDF2MWgtMXpNMTIgMzBoMXYxaC0xek0xNCAzMGgxdjFoLTF6TTIxIDMwaDF2MWgtMXpNMjQgMzBoMXYxaC0xek0yNSAzMGgxdjFoLTF6TTI3IDMwaDF2MWgtMXpNMjggMzBoMXYxaC0xek0yOSAzMGgxdjFoLTF6TTMyIDMwaDF2MWgtMXpNNCAzMWgxdjFoLTF6TTEwIDMxaDF2MWgtMXpNMTMgMzFoMXYxaC0xek0xNCAzMWgxdjFoLTF6TTE1IDMxaDF2MWgtMXpNMTYgMzFoMXYxaC0xek0xNyAzMWgxdjFoLTF6TTE4IDMxaDF2MWgtMXpNMjEgMzFoMXYxaC0xek0yMiAzMWgxdjFoLTF6TTIzIDMxaDF2MWgtMXpNMjQgMzFoMXYxaC0xek0yOCAzMWgxdjFoLTF6TTMxIDMxaDF2MWgtMXpNNCAzMmgxdjFoLTF6TTUgMzJoMXYxaC0xek02IDMyaDF2MWgtMXpNNyAzMmgxdjFoLTF6TTggMzJoMXYxaC0xek05IDMyaDF2MWgtMXpNMTAgMzJoMXYxaC0xek0xMiAzMmgxdjFoLTF6TTEzIDMyaDF2MWgtMXpNMTcgMzJoMXYxaC0xek0xOCAzMmgxdjFoLTF6TTIwIDMyaDF2MWgtMXpNMjEgMzJoMXYxaC0xek0yMyAzMmgxdjFoLTF6TTI0IDMyaDF2MWgtMXpNMjYgMzJoMXYxaC0xek0yNyAzMmgxdjFoLTF6TTI4IDMyaDF2MWgtMXpNMjkgMzJoMXYxaC0xek0zMSAzMmgxdjFoLTF6TTMyIDMyaDF2MWgtMXoiLz48L3N2Zz4=" width="120" height="120" alt="Scan to open Instagram @yoocamdoit"></a>
+</section>
+</main>
+<script>const home = document.querySelector('.home');
+const folders = [...document.querySelectorAll('.folder-view')];
+const projects = [...document.querySelectorAll('.detail')];
+const back = document.querySelector('.folder-back');
+const contact = document.querySelector('.contact-view');
+const siteName = document.querySelector('.site-name');
+const navLinks = [...document.querySelectorAll('.site-nav a')];
+const layout = document.querySelector('.folder-layout');
+const projectLists = [...document.querySelectorAll('.project-list')];
+const defaultTitle = document.title;
+let lastFolder;
+let initialized = false;
+function route() {
+  const requested = location.hash.slice(1);
+  const isContact = requested === 'contact';
+  const directProject = projects.find(section => section.id === requested);
+  const folder = folders.find(section => section.id === (directProject?.dataset.folder ?? requested));
+  const entries = projects.filter(project => project.dataset.folder === folder?.id);
+  if (initialized && lastFolder !== folder) {
+    for (const entry of projects) {
+      entry.querySelector('video')?.pause();
+    }
+  }
+  home.hidden = Boolean(folder) || isContact;
+  contact.hidden = !isContact;
+  for (const link of navLinks) {
+    if (link.hash === (isContact ? '#contact' : '#work')) link.setAttribute('aria-current', 'page');
+    else link.removeAttribute('aria-current');
+  }
+  for (const section of folders) section.hidden = section !== folder || entries.length > 0;
+  for (const entry of projects) entry.hidden = !entries.includes(entry);
+  back.hidden = !folder;
+  layout.hidden = entries.length === 0;
+  for (const list of projectLists) {
+    list.hidden = list.dataset.folder !== folder?.id;
+    for (const link of list.querySelectorAll('a')) {
+      if (link.hash === '#' + (directProject ?? entries[0])?.id) link.setAttribute('aria-current', 'location');
+      else link.removeAttribute('aria-current');
+    }
+  }
+  document.title = isContact ? 'Contact — yoocamdoit' : folder ? folder.dataset.title + ' — yoocamdoit' : defaultTitle;
+  for (const entry of entries) {
+    const video = entry.querySelector('video[data-source]');
+    if (video && !video.hasAttribute('src')) video.src = video.dataset.source;
+  }
+  const target = isContact ? contact : directProject ?? entries[0] ?? folder;
+  if (initialized) (target?.querySelector('h1, h2') ?? siteName).focus({preventScroll:true});
+  if (directProject) directProject.scrollIntoView();
+  else window.scrollTo(0, 0);
+  lastFolder = folder;
+  initialized = true;
+}
+for (const entry of projects) {
+  const video = entry.querySelector('video');
+  if (!video) continue;
+  video.addEventListener('play', () => {
+    for (const other of projects) if (other !== entry) other.querySelector('video')?.pause();
+  });
+}
+window.addEventListener('hashchange', route);
+route();</script>
+</body>
+</html>
