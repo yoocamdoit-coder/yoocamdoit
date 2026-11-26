@@ -91,33 +91,6 @@ a:focus-visible, button:focus-visible { outline: 2px solid #dad7be; outline-offs
   filter: drop-shadow(0 1px 3px #000);
 }
 .cover-toggle[data-playing]::before { width: 8px; height: 8px; margin: 0; border: 0; background: currentColor; }
-.cover-jog {
-  position: absolute; z-index: 3; top: 25%; left: 50%; transform: translate(-50%, -50%);
-  width: min(112px, 28vw); height: 44px; color: #fff;
-}
-.jog-ridges {
-  position: absolute; inset: 11px 0; border-block: 1px solid #ffffff70;
-  background: repeating-linear-gradient(90deg, #fff6 0 1px, transparent 1px 6px), #080808e8;
-}
-.jog-needle {
-  position: absolute; top: 9px; bottom: 9px; left: clamp(2px, var(--jog-position, 0%), calc(100% - 2px));
-  width: 2px; transform: translateX(-50%); background: #fff; box-shadow: 0 0 2px #000;
-}
-.cover-jog input {
-  position: absolute; inset: 0; width: 100%; height: 100%; margin: 0;
-  opacity: 0; cursor: ew-resize; touch-action: pan-y;
-}
-.cover-jog:has(input:focus-visible) .jog-ridges { outline: 1px solid #fff; outline-offset: 4px; }
-.jog-frame {
-  display: none; position: absolute; left: 50%; bottom: calc(100% - 9px);
-  transform: translateX(-50%); width: max-content; padding: 4px 6px; background: #080808;
-  font: 10px/1.1 ui-monospace, monospace; font-variant-numeric: tabular-nums;
-}
-.cover-jog.show-frame .jog-frame { display: block; }
-@media (forced-colors: active) {
-  .cover-jog input { opacity: 1; }
-  .jog-ridges, .jog-needle { display: none; }
-}
 .folder-tile:hover img { transform: scale(1.02); }
 @media (prefers-reduced-motion: no-preference) {
   .folder-tile img { transition: transform 220ms ease; }
@@ -233,12 +206,6 @@ a:focus-visible, button:focus-visible { outline: 2px solid #dad7be; outline-offs
   <div class="folder-tile folder-locked" aria-disabled="true"><span class="folder-label"><time datetime="2027">2027</time>Personal Work</span></div>
 </nav>
   <button type="button" class="cover-toggle" aria-controls="commercial-preview personal-preview" aria-label="Play cover previews" hidden></button>
-  <div class="cover-jog" hidden>
-    <div class="jog-ridges" aria-hidden="true"></div>
-    <i class="jog-needle" aria-hidden="true"></i>
-    <output class="jog-frame" for="cover-scrub" aria-hidden="true">001 / 354</output>
-    <input id="cover-scrub" type="range" min="0" max="353" value="0" aria-label="Scrub both preview clips" aria-controls="commercial-preview personal-preview" aria-valuetext="Frame 1 of 354">
-  </div>
 </section>
 <section class="folder-view" id="commercial" hidden aria-labelledby="commercial-title" data-title="2026 Commercial">
 <h1 id="commercial-title" tabindex="-1">2026 Commercial</h1>
@@ -452,16 +419,10 @@ eiControl.hidden = false;
 
 const previewButton = home.querySelector('.cover-toggle');
 const previews = [...home.querySelectorAll('.cover-preview')];
-const jogControl = home.querySelector('.cover-jog');
-const jog = jogControl.querySelector('input');
-const frameReadout = jogControl.querySelector('output');
 const pendingPreviews = new Set();
 let previewOpen = false;
-let jogging = false;
 let playAttempt = 0;
 let blackoutTimer;
-let seekFrame = 0;
-let readoutTimer;
 
 function setPreviewButton(playing) {
   previewButton.toggleAttribute('data-playing', playing);
@@ -469,26 +430,10 @@ function setPreviewButton(playing) {
   previewButton.title = previewButton.getAttribute('aria-label');
 }
 
-function loadPreview(video) {
-  if (!video.hasAttribute('src')) video.src = video.dataset.preview;
-}
-
-function setJogReadout() {
-  const frame = jog.valueAsNumber;
-  const last = Number(jog.max);
-  frameReadout.value = String(frame + 1).padStart(3, '0') + ' / ' + (last + 1);
-  jog.setAttribute('aria-valuetext', 'Frame ' + (frame + 1) + ' of ' + (last + 1));
-  jogControl.style.setProperty('--jog-position', (frame / last * 100) + '%');
-}
-
 function stopPreviews() {
   ++playAttempt;
   clearTimeout(blackoutTimer);
-  clearTimeout(readoutTimer);
-  cancelAnimationFrame(seekFrame);
-  seekFrame = 0;
   previewOpen = false;
-  jogging = false;
   pendingPreviews.clear();
   for (const video of previews) {
     video.pause();
@@ -496,46 +441,7 @@ function stopPreviews() {
     video.closest('.folder-cover').classList.remove('is-playing');
   }
   home.classList.remove('preview-blackout');
-  jogControl.classList.remove('show-frame');
-  jog.valueAsNumber = 0;
-  setJogReadout();
   setPreviewButton(false);
-}
-
-function seekPreview(video) {
-  const duration = video.duration;
-  if (!Number.isFinite(duration) || duration <= 0) return;
-  const fraction = jog.valueAsNumber / Number(jog.max);
-  const time = fraction * Math.max(0, duration - 1 / 24);
-  if (Math.abs(video.currentTime - time) > 0.001) video.currentTime = time;
-  else if (video.readyState >= 2 && !video.seeking) video.closest('.folder-cover').classList.add('is-playing');
-}
-
-function scrubPreviews() {
-  if (!jogging) {
-    ++playAttempt;
-    clearTimeout(blackoutTimer);
-    previewOpen = false;
-    pendingPreviews.clear();
-    home.classList.remove('preview-blackout');
-    jogging = true;
-    setPreviewButton(false);
-    for (const video of previews) {
-      video.pause();
-      video.preload = 'auto';
-      loadPreview(video);
-    }
-  }
-  setJogReadout();
-  jogControl.classList.add('show-frame');
-  clearTimeout(readoutTimer);
-  readoutTimer = setTimeout(() => jogControl.classList.remove('show-frame'), 1000);
-  if (!seekFrame) {
-    seekFrame = requestAnimationFrame(() => {
-      seekFrame = 0;
-      if (jogging) for (const video of previews) seekPreview(video);
-    });
-  }
 }
 
 for (const video of previews) {
@@ -543,21 +449,13 @@ for (const video of previews) {
   video.addEventListener('playing', () => {
     if (previewOpen && pendingPreviews.has(video)) cover.classList.add('is-playing');
   });
-  video.addEventListener('loadedmetadata', () => {
-    if (jogging) seekPreview(video);
-  });
-  for (const event of ['seeked', 'loadeddata']) {
-    video.addEventListener(event, () => {
-      if (jogging && !video.seeking) cover.classList.add('is-playing');
-    });
-  }
   video.addEventListener('ended', () => {
-    if (!previewOpen || !pendingPreviews.delete(video) || pendingPreviews.size) return;
+    if (!pendingPreviews.delete(video) || pendingPreviews.size) return;
     home.classList.add('preview-blackout');
     blackoutTimer = setTimeout(stopPreviews, 450);
   });
   video.addEventListener('error', () => {
-    if (previewOpen || jogging) stopPreviews();
+    if (previewOpen) stopPreviews();
   });
 }
 previewButton.addEventListener('click', () => {
@@ -566,37 +464,20 @@ previewButton.addEventListener('click', () => {
     return;
   }
   const attempt = ++playAttempt;
-  if (jogging) for (const video of previews) seekPreview(video);
-  jogging = false;
   previewOpen = true;
-  jogControl.classList.remove('show-frame');
   for (const video of previews) pendingPreviews.add(video);
   setPreviewButton(true);
   for (const video of previews) {
     video.muted = true;
-    loadPreview(video);
+    if (!video.hasAttribute('src')) video.src = video.dataset.preview;
     video.play().catch(() => {
       if (attempt === playAttempt) stopPreviews();
     });
   }
 });
-previews[1].addEventListener('timeupdate', () => {
-  if (!previewOpen || !Number.isFinite(previews[1].duration) || previews[1].duration <= 0) return;
-  jog.valueAsNumber = Math.round(Math.min(1, previews[1].currentTime / previews[1].duration) * Number(jog.max));
-  setJogReadout();
-});
-jog.addEventListener('input', scrubPreviews);
-jog.addEventListener('keydown', event => {
-  if (event.key === 'Escape' && (jogging || previewOpen)) {
-    event.preventDefault();
-    stopPreviews();
-  }
-});
-setJogReadout();
 previewButton.hidden = false;
-jogControl.hidden = false;
 document.addEventListener('visibilitychange', () => {
-  if (document.hidden && (previewOpen || jogging)) stopPreviews();
+  if (document.hidden && previewOpen) stopPreviews();
 });
 
 const folders = [...document.querySelectorAll('.folder-view')];
@@ -621,7 +502,7 @@ function route() {
     }
   }
   home.hidden = Boolean(folder) || isContact;
-  if (home.hidden && (previewOpen || jogging)) stopPreviews();
+  if (home.hidden && previewOpen) stopPreviews();
   contact.hidden = !isContact;
   for (const link of navLinks) {
     if (link.hash === (isContact ? '#contact' : '#work')) link.setAttribute('aria-current', 'page');
