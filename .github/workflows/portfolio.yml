@@ -6,6 +6,7 @@ on:
 
 permissions:
   contents: read
+  actions: read
   pages: write
   id-token: write
 
@@ -14,12 +15,10 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  deploy:
+  build:
     runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
     steps:
+      - uses: actions/checkout@v6
       - uses: actions/configure-pages@v5
       - name: Prepare portfolio files
         env:
@@ -27,10 +26,30 @@ jobs:
         run: |
           gh release download portfolio-assets --repo "$GITHUB_REPOSITORY" --pattern yoocamdoit.zip --output site.zip
           unzip -q site.zip -d public
-          test -f public/index.html
+          cp index.html public/index.html
           test -f public/media/howfar.mp4
       - uses: actions/upload-pages-artifact@v4
         with:
+          name: github-pages
           path: public
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Wait for GitHub to index the Pages artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          for attempt in {1..12}; do
+            ready=$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID/artifacts?name=github-pages" --jq .total_count)
+            if [ "$ready" -gt 0 ]; then exit 0; fi
+            sleep 5
+          done
+          exit 1
       - uses: actions/deploy-pages@v4
         id: deployment
+        with:
+          artifact_name: github-pages
