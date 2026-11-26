@@ -3,12 +3,10 @@ from argparse import ArgumentParser
 from pathlib import Path
 import subprocess
 
-# Times and lengths are expressed as frames on each 24 fps source.
+# Start frames at 24 fps. Both excerpts continue through the source's final frame.
 COVERS = {
-    # From the first runner after the close-up to the cut back to the wide shot.
-    "commercial": ("run-alone", 416, 142, "scale=960:540"),
-    # From the final group lineup to the title card.
-    "personal": ("victor", 1686, 493, "crop=iw*3/4:ih,scale=960:720"),
+    "commercial": ("run-alone", 416, "scale=960:540"),
+    "personal": ("victor", 2104, "crop=iw*3/4:ih,scale=960:720"),
 }
 
 def main():
@@ -16,13 +14,13 @@ def main():
     parser.add_argument("media", type=Path)
     parser.add_argument("--ffmpeg", default="ffmpeg")
     args = parser.parse_args()
-    for name, (film, start, frames, framing) in COVERS.items():
+    for name, (film, start, framing) in COVERS.items():
         subprocess.run([
             args.ffmpeg, "-hide_banner", "-loglevel", "error", "-nostdin", "-y",
             "-threads", "2", "-ss", f"{start / 24:.6f}",
             "-i", str(args.media / f"{film}.mp4"), "-map", "0:v:0", "-an",
             "-filter_threads", "2", "-vf", f"fps=24,{framing},setsar=1",
-            "-frames:v", str(frames), "-c:v", "libx264", "-preset", "fast",
+            "-c:v", "libx264", "-preset", "fast",
             "-crf", "24", "-maxrate", "1800k", "-bufsize", "3600k",
             "-threads", "2", "-pix_fmt", "yuv420p", "-movflags", "+faststart",
             str(args.media / f"{name}-preview.mp4"),

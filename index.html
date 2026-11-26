@@ -35,33 +35,44 @@ a:focus-visible, button:focus-visible { outline: 2px solid #dad7be; outline-offs
 .ei-control {
   position: fixed; z-index: 5;
   right: max(16px, env(safe-area-inset-right)); bottom: max(16px, env(safe-area-inset-bottom));
-  width: min(140px, calc(100vw - 32px));
-  color: #eee8d7; font: 500 11px/1.2 "Avenir Next", "Helvetica Neue", "Segoe UI", sans-serif;
-  text-shadow: 0 1px 4px #000, 0 0 8px #000;
+  width: min(124px, calc(100vw - 32px)); color: #fff;
+  font: 600 10px/1 "Arial Narrow", "Avenir Next Condensed", "Segoe UI", sans-serif;
+  text-shadow: 0 1px 3px #000, 0 0 7px #000;
 }
-.ei-readout { display: flex; align-items: baseline; justify-content: space-between; letter-spacing: .16em; }
-.ei-readout output { color: #e1c988; font-size: 16px; font-variant-numeric: tabular-nums; letter-spacing: .03em; }
-.ei-scale { position: relative; display: grid; align-items: center; height: 26px; }
-.ei-scale::before {
-  content: ""; position: absolute; inset-inline: 3px; height: 3px;
-  background: linear-gradient(to right,
-    #242520 calc(4% + var(--tone-shift, 0%)),
-    #8b8470 calc(50% + var(--tone-shift, 0%)),
-    #eee8d7 calc(96% + var(--tone-shift, 0%)));
-  box-shadow: 0 1px 3px #000a;
+.ei-readout { display: flex; align-items: baseline; justify-content: space-between; letter-spacing: .18em; }
+.ei-readout output { font-size: 17px; font-variant-numeric: tabular-nums; letter-spacing: .03em; }
+.ei-scale { position: relative; height: 34px; }
+.ei-zones {
+  position: absolute; inset: 4px 0 8px;
+  display: grid; grid-template-columns: repeat(7, 1fr); align-items: end; gap: 3px;
+  pointer-events: none;
+}
+.ei-zones span {
+  position: relative; height: var(--zone-height); background: var(--zone-tone);
+  box-shadow: 0 0 0 1px #0009, inset 0 0 0 1px #ffffff29;
+}
+.ei-zones span:nth-child(1) { --zone-height: 19%; --zone-tone: #151515; }
+.ei-zones span:nth-child(2) { --zone-height: 28%; --zone-tone: #343434; }
+.ei-zones span:nth-child(3) { --zone-height: 39%; --zone-tone: #575757; }
+.ei-zones span:nth-child(4) { --zone-height: 51%; --zone-tone: #7c7c7c; }
+.ei-zones span:nth-child(5) { --zone-height: 66%; --zone-tone: #a1a1a1; }
+.ei-zones span:nth-child(6) { --zone-height: 82%; --zone-tone: #c7c7c7; }
+.ei-zones span:nth-child(7) { --zone-height: 100%; --zone-tone: #ededed; }
+.ei-zones span[data-selected] { background: #fff; }
+.ei-zones span[data-selected]::after {
+  content: ""; position: absolute; bottom: -6px; left: 50%;
+  width: 5px; height: 2px; translate: -50% 0; background: #fff;
+  box-shadow: 0 0 0 1px #0009;
 }
 .ei-track {
-  position: relative; display: block; width: 100%; height: 26px; margin: 0;
-  appearance: none; background: transparent; cursor: ew-resize;
+  position: absolute; inset: 0; width: 100%; height: 100%; margin: 0;
+  opacity: 0; cursor: ew-resize;
 }
-.ei-track::-webkit-slider-thumb {
-  appearance: none; width: 5px; height: 12px;
-  background: #e1c988; border: 1px solid #181913; border-radius: 0;
+.ei-scale:focus-within { outline: 1px solid #fff; outline-offset: 4px; }
+@media (forced-colors: active) {
+  .ei-zones { display: none; }
+  .ei-track { opacity: 1; }
 }
-.ei-track::-moz-range-thumb {
-  width: 4px; height: 10px; background: #e1c988; border: 1px solid #181913; border-radius: 0;
-}
-.ei-track:focus-visible { outline: 1px solid #eee8d7; outline-offset: 2px; }
 .folder-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); grid-template-rows: repeat(2,minmax(0,1fr)); gap: 1px; min-height: max(380px, calc(100svh - 76px)); }
 .folder-tile { display: block; min-width: 0; position: relative; isolation: isolate; overflow: hidden; background: #24251f; }
 .folder-tile::after { content: ""; position: absolute; inset: 0; background: #08090755; pointer-events: none; }
@@ -73,10 +84,10 @@ a:focus-visible, button:focus-visible { outline: 2px solid #dad7be; outline-offs
 .cover-toggle {
   display: grid; place-items: center; position: absolute; left: 50%; top: 8px; z-index: 2;
   transform: translateX(-50%); width: 44px; height: 44px; padding: 0;
-  border: 0; color: #f4eddb; background: transparent; cursor: pointer;
+  border: 0; color: #fff; background: transparent; cursor: pointer;
 }
-.cover-toggle:hover { color: #e1c988; }
-.cover-toggle:focus-visible { outline: 1px solid #eee8d7; outline-offset: -6px; }
+.cover-toggle:hover { color: #bdbdbd; }
+.cover-toggle:focus-visible { outline: 1px solid #fff; outline-offset: -6px; }
 .cover-toggle::before {
   content: ""; width: 0; height: 0; margin-inline-start: 2px;
   border-block: 5px solid transparent; border-inline-start: 8px solid currentColor;
@@ -189,10 +200,10 @@ a:focus-visible, button:focus-visible { outline: 2px solid #dad7be; outline-offs
 <section class="home" id="work" aria-label="Work">
 <nav class="folder-grid" aria-label="Work folders">
   <div class="folder-cover">
-    <a class="folder-tile" href="#commercial"><img src="./media/run-alone-still-3.webp" alt="" decoding="async"><video class="cover-preview" id="commercial-preview" data-preview="./media/commercial-preview.mp4?v=full-sequence" muted playsinline preload="none" aria-hidden="true"></video><span class="folder-label"><time datetime="2026">2026</time>Commercial</span></a>
+    <a class="folder-tile" href="#commercial"><img src="./media/run-alone-still-3.webp" alt="" decoding="async"><video class="cover-preview" id="commercial-preview" data-preview="./media/commercial-preview.mp4?v=through-end" muted playsinline preload="none" aria-hidden="true"></video><span class="folder-label"><time datetime="2026">2026</time>Commercial</span></a>
   </div>
   <div class="folder-cover">
-    <a class="folder-tile" href="#personal"><img src="./media/victor-still-4.webp" alt="" decoding="async"><video class="cover-preview" id="personal-preview" data-preview="./media/personal-preview.mp4?v=full-sequence" muted playsinline preload="none" aria-hidden="true"></video><span class="folder-label"><time datetime="2026">2026</time>Personal Work</span></a>
+    <a class="folder-tile" href="#personal"><img src="./media/victor-still-4.webp" alt="" decoding="async"><video class="cover-preview" id="personal-preview" data-preview="./media/personal-preview.mp4?v=through-end" muted playsinline preload="none" aria-hidden="true"></video><span class="folder-label"><time datetime="2026">2026</time>Personal Work</span></a>
   </div>
   <div class="folder-tile folder-locked" aria-disabled="true"><span class="folder-label"><time datetime="2027">2027</time>Commercial</span></div>
   <div class="folder-tile folder-locked" aria-disabled="true"><span class="folder-label"><time datetime="2027">2027</time>Personal Work</span></div>
@@ -381,6 +392,7 @@ a:focus-visible, button:focus-visible { outline: 2px solid #dad7be; outline-offs
 <div class="ei-control" role="group" aria-label="Screen brightness" hidden>
   <div class="ei-readout"><label for="screen-ei" aria-label="Exposure index">EI</label><output for="screen-ei">800</output></div>
   <div class="ei-scale">
+    <div class="ei-zones" aria-hidden="true"><span></span><span></span><span></span><span data-selected></span><span></span><span></span><span></span></div>
     <input class="ei-track" id="screen-ei" type="range" min="0" max="6" step="1" value="3" aria-valuetext="EI 800">
   </div>
 </div>
@@ -389,6 +401,7 @@ const exposureView = document.querySelector('.exposure-view');
 const eiControl = document.querySelector('.ei-control');
 const ei = document.querySelector('#screen-ei');
 const eiReadout = eiControl.querySelector('output');
+const eiZones = [...eiControl.querySelectorAll('.ei-zones span')];
 const brightnessByStop = [0.58, 0.7, 0.84, 1, 1.16, 1.34, 1.56];
 
 function setExposure() {
@@ -399,7 +412,7 @@ function setExposure() {
   exposureView.toggleAttribute('data-ei-adjusted', brightness !== 1);
   eiReadout.value = value;
   ei.setAttribute('aria-valuetext', 'EI ' + value);
-  eiControl.style.setProperty('--tone-shift', (3 - stop) * 8 + '%');
+  eiZones.forEach((zone, index) => zone.toggleAttribute('data-selected', index === stop));
 }
 
 ei.addEventListener('input', setExposure);
