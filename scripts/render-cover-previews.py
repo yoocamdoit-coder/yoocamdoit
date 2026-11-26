@@ -5,8 +5,8 @@ import subprocess
 
 # Start frames at 24 fps. Both excerpts continue through the source's final frame.
 COVERS = {
-    "commercial": ("run-alone", 416, "scale=960:540"),
-    "personal": ("victor", 2104, "crop=iw*3/4:ih,scale=960:720"),
+    "commercial": ("run-alone", 417, "scale=960:540"),
+    "personal": ("victor", 2102, "crop=iw*3/4:ih,scale=960:720"),
 }
 
 def main():
