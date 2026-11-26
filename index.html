@@ -29,11 +29,21 @@ a:focus-visible, button:focus-visible { outline: 2px solid #dad7be; outline-offs
 .out:hover { text-decoration: underline; text-underline-offset: 4px; }
 .skip { position: fixed; z-index: 3; top: 1rem; left: 1rem; background: var(--bg); padding: .7rem; transform: translateY(-170%); }
 .skip:focus { transform: none; }
-.home { width: 100%; }
+.home { position: relative; width: 100%; }
+.teaser-toggle {
+  position: absolute; z-index: 2; top: 10px; right: 10px;
+  padding: 7px 11px; border: 1px solid #ffffff45; border-radius: 2px;
+  background: #080907a8; color: #fff; font: inherit; font-size: 12px;
+  cursor: pointer;
+}
+.teaser-toggle:hover { background: #080907; }
 .folder-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); grid-template-rows: repeat(2,minmax(0,1fr)); gap: 1px; min-height: max(380px, calc(100svh - 76px)); }
 .folder-tile { display: block; min-width: 0; position: relative; isolation: isolate; overflow: hidden; background: #24251f; }
 .folder-tile::after { content: ""; position: absolute; inset: 0; background: #08090755; pointer-events: none; }
-.folder-tile img { position: absolute; inset: 0; display: block; width: 100%; height: 100%; object-fit: cover; }
+.folder-tile img, .folder-teaser { position: absolute; inset: 0; display: block; width: 100%; height: 100%; object-fit: cover; }
+.folder-teaser { opacity: 0; pointer-events: none; }
+.folder-teaser.is-ready { opacity: 1; }
+@media (prefers-reduced-motion: reduce) { .folder-teaser { display: none; } }
 .folder-tile:hover img { transform: scale(1.02); }
 @media (prefers-reduced-motion: no-preference) {
   .folder-tile img { transition: transform 220ms ease; }
@@ -138,11 +148,12 @@ a:focus-visible, button:focus-visible { outline: 2px solid #dad7be; outline-offs
 <main id="main" class="shell">
 <section class="home" id="work" aria-label="Work">
 <nav class="folder-grid" aria-label="Work folders">
-  <a class="folder-tile" href="#commercial"><img src="./media/run-alone-still-3.webp" alt="" decoding="async"><span class="folder-label"><time datetime="2026">2026</time>Commercial</span></a>
-  <a class="folder-tile" href="#personal"><img src="./media/victor-still-4.webp" alt="" decoding="async"><span class="folder-label"><time datetime="2026">2026</time>Personal Work</span></a>
+  <a class="folder-tile" href="#commercial"><img src="./media/run-alone-still-3.webp" alt="" decoding="async"><video class="folder-teaser" data-preview="./media/commercial-teaser.mp4" muted loop playsinline preload="none" aria-hidden="true"></video><span class="folder-label"><time datetime="2026">2026</time>Commercial</span></a>
+  <a class="folder-tile" href="#personal"><img src="./media/victor-still-4.webp" alt="" decoding="async"><video class="folder-teaser" data-preview="./media/personal-teaser.mp4" muted loop playsinline preload="none" aria-hidden="true"></video><span class="folder-label"><time datetime="2026">2026</time>Personal Work</span></a>
   <div class="folder-tile folder-locked" aria-disabled="true"><span class="folder-label"><time datetime="2027">2027</time>Commercial</span></div>
   <div class="folder-tile folder-locked" aria-disabled="true"><span class="folder-label"><time datetime="2027">2027</time>Personal Work</span></div>
 </nav>
+  <button type="button" class="teaser-toggle" hidden>Pause teasers</button>
 </section>
 <section class="folder-view" id="commercial" hidden aria-labelledby="commercial-title" data-title="2026 Commercial">
 <h1 id="commercial-title" tabindex="-1">2026 Commercial</h1>
@@ -323,6 +334,47 @@ a:focus-visible, button:focus-visible { outline: 2px solid #dad7be; outline-offs
 </section>
 </main>
 <script>const home = document.querySelector('.home');
+const teasers = [...home.querySelectorAll('.folder-teaser')];
+const teaserToggle = home.querySelector('.teaser-toggle');
+const motionPreference = matchMedia('(prefers-reduced-motion: reduce)');
+let teasersPaused = false;
+let teaserUpdate = 0;
+
+function updateTeasers() {
+  const update = ++teaserUpdate;
+  const allowed = !home.hidden && !motionPreference.matches && !navigator.connection?.saveData;
+  const shouldPlay = allowed && !document.hidden && !teasersPaused;
+  teaserToggle.hidden = !allowed;
+  teaserToggle.textContent = teasersPaused ? 'Play teasers' : 'Pause teasers';
+
+  if (!shouldPlay) {
+    for (const teaser of teasers) teaser.pause();
+    return;
+  }
+
+  const attempts = teasers.map(teaser => {
+    teaser.muted = true;
+    if (!teaser.hasAttribute('src')) teaser.src = teaser.dataset.preview;
+    return teaser.play();
+  });
+  Promise.allSettled(attempts).then(results => {
+    if (update === teaserUpdate && results.every(result => result.status === 'rejected')) {
+      teasersPaused = true;
+      teaserToggle.textContent = 'Play teasers';
+    }
+  });
+}
+
+for (const teaser of teasers) {
+  teaser.addEventListener('playing', () => teaser.classList.add('is-ready'));
+  teaser.addEventListener('error', () => teaser.classList.remove('is-ready'));
+}
+teaserToggle.addEventListener('click', () => {
+  teasersPaused = !teasersPaused;
+  updateTeasers();
+});
+motionPreference.addEventListener('change', updateTeasers);
+document.addEventListener('visibilitychange', updateTeasers);
 const folders = [...document.querySelectorAll('.folder-view')];
 const projects = [...document.querySelectorAll('.detail')];
 const back = document.querySelector('.folder-back');
@@ -345,6 +397,7 @@ function route() {
     }
   }
   home.hidden = Boolean(folder) || isContact;
+  updateTeasers();
   contact.hidden = !isContact;
   for (const link of navLinks) {
     if (link.hash === (isContact ? '#contact' : '#work')) link.setAttribute('aria-current', 'page');
