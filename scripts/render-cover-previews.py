@@ -5,7 +5,7 @@ import subprocess
 
 # Start and exclusive end frames at 24 fps. None means play through the source end.
 COVERS = {
-    "commercial": ("run-alone", 378, None, "scale=960:540"),
+    "commercial": ("run-alone", 417, None, "scale=960:540"),
     "personal": ("victor", 1851, 2205, "crop=iw*3/4:ih,scale=960:720"),
 }
 

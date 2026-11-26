@@ -74,6 +74,10 @@ a:focus-visible, button:focus-visible { outline: 2px solid #dad7be; outline-offs
 .folder-cover > .folder-tile { position: absolute; inset: 0; }
 .cover-preview { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; pointer-events: none; }
 .folder-cover.is-playing .cover-preview { opacity: 1; }
+.preview-blackout .folder-cover::after {
+  content: ""; position: absolute; inset: 0; z-index: 3;
+  background: #000; pointer-events: none;
+}
 .cover-toggle {
   display: grid; place-items: center; position: absolute; left: 50%; top: 8px; z-index: 2;
   transform: translateX(-50%); width: 44px; height: 44px; padding: 0;
@@ -193,7 +197,7 @@ a:focus-visible, button:focus-visible { outline: 2px solid #dad7be; outline-offs
 <section class="home" id="work" aria-label="Work">
 <nav class="folder-grid" aria-label="Work folders">
   <div class="folder-cover">
-    <a class="folder-tile" href="#commercial"><img src="./media/run-alone-still-3.webp" alt="" decoding="async"><video class="cover-preview" id="commercial-preview" data-preview="./media/commercial-preview.mp4?v=matched-length" muted playsinline preload="none" aria-hidden="true"></video><span class="folder-label"><time datetime="2026">2026</time>Commercial</span></a>
+    <a class="folder-tile" href="#commercial"><img src="./media/run-alone-still-3.webp" alt="" decoding="async"><video class="cover-preview" id="commercial-preview" data-preview="./media/commercial-preview.mp4?v=match-cut" muted playsinline preload="none" aria-hidden="true"></video><span class="folder-label"><time datetime="2026">2026</time>Commercial</span></a>
   </div>
   <div class="folder-cover">
     <a class="folder-tile" href="#personal"><img src="./media/victor-still-4.webp" alt="" decoding="async"><video class="cover-preview" id="personal-preview" data-preview="./media/personal-preview.mp4?v=overhead" muted playsinline preload="none" aria-hidden="true"></video><span class="folder-label"><time datetime="2026">2026</time>Personal Work</span></a>
@@ -415,63 +419,65 @@ eiControl.hidden = false;
 
 const previewButton = home.querySelector('.cover-toggle');
 const previews = [...home.querySelectorAll('.cover-preview')];
-const activePreviews = new Set();
+const pendingPreviews = new Set();
+let previewOpen = false;
 let playAttempt = 0;
+let blackoutTimer;
 
-function updatePreviewButton() {
-  const playing = activePreviews.size > 0;
+function setPreviewButton(playing) {
   previewButton.toggleAttribute('data-playing', playing);
   previewButton.setAttribute('aria-label', playing ? 'Stop cover previews' : 'Play cover previews');
   previewButton.title = previewButton.getAttribute('aria-label');
 }
 
-function resetPreview(video) {
-  activePreviews.delete(video);
-  video.pause();
-  if (video.readyState > 0) video.currentTime = 0;
-  video.closest('.folder-cover').classList.remove('is-playing');
-}
-
 function stopPreviews() {
   ++playAttempt;
-  for (const video of previews) resetPreview(video);
-  updatePreviewButton();
+  clearTimeout(blackoutTimer);
+  previewOpen = false;
+  pendingPreviews.clear();
+  for (const video of previews) {
+    video.pause();
+    if (video.readyState > 0) video.currentTime = 0;
+    video.closest('.folder-cover').classList.remove('is-playing');
+  }
+  home.classList.remove('preview-blackout');
+  setPreviewButton(false);
 }
 
 for (const video of previews) {
   const cover = video.closest('.folder-cover');
   video.addEventListener('playing', () => {
-    if (activePreviews.has(video)) cover.classList.add('is-playing');
+    if (previewOpen && pendingPreviews.has(video)) cover.classList.add('is-playing');
   });
-  const finish = () => {
-    resetPreview(video);
-    updatePreviewButton();
-  };
-  video.addEventListener('ended', finish);
-  video.addEventListener('error', finish);
+  video.addEventListener('ended', () => {
+    if (!pendingPreviews.delete(video) || pendingPreviews.size) return;
+    home.classList.add('preview-blackout');
+    blackoutTimer = setTimeout(stopPreviews, 450);
+  });
+  video.addEventListener('error', () => {
+    if (previewOpen) stopPreviews();
+  });
 }
 previewButton.addEventListener('click', () => {
-  if (activePreviews.size) {
+  if (previewOpen) {
     stopPreviews();
     return;
   }
   const attempt = ++playAttempt;
-  for (const video of previews) activePreviews.add(video);
-  updatePreviewButton();
+  previewOpen = true;
+  for (const video of previews) pendingPreviews.add(video);
+  setPreviewButton(true);
   for (const video of previews) {
     video.muted = true;
     if (!video.hasAttribute('src')) video.src = video.dataset.preview;
     video.play().catch(() => {
-      if (attempt === playAttempt) {
-        resetPreview(video);
-        updatePreviewButton();
-      }
+      if (attempt === playAttempt) stopPreviews();
     });
   }
 });
 previewButton.hidden = false;
 document.addEventListener('visibilitychange', () => {
-  if (document.hidden) stopPreviews();
+  if (document.hidden && previewOpen) stopPreviews();
 });
 
 const folders = [...document.querySelectorAll('.folder-view')];
@@ -496,7 +502,7 @@ function route() {
     }
   }
   home.hidden = Boolean(folder) || isContact;
-  if (home.hidden && activePreviews.size) stopPreviews();
+  if (home.hidden && previewOpen) stopPreviews();
   contact.hidden = !isContact;
   for (const link of navLinks) {
     if (link.hash === (isContact ? '#contact' : '#work')) link.setAttribute('aria-current', 'page');
