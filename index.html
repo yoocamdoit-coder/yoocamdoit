@@ -29,42 +29,39 @@ a:focus-visible, button:focus-visible { outline: 2px solid #dad7be; outline-offs
 .out:hover { text-decoration: underline; text-underline-offset: 4px; }
 .skip { position: fixed; z-index: 3; top: 1rem; left: 1rem; background: var(--bg); padding: .7rem; transform: translateY(-170%); }
 .skip:focus { transform: none; }
-.home { width: 100%; }
+.home { width: 100%; position: relative; }
 .exposure-view { min-height: 100vh; background: var(--bg); }
-.exposure-view[data-iso-adjusted] { filter: brightness(var(--site-brightness)); }
-.iso-control {
+.exposure-view[data-ei-adjusted] { filter: brightness(var(--site-brightness)); }
+.ei-control {
   position: fixed; z-index: 5;
-  right: max(14px, env(safe-area-inset-right)); bottom: max(14px, env(safe-area-inset-bottom));
-  width: min(158px, calc(100vw - 28px)); padding: 8px 10px 6px;
-  color: #ece8dc; background: #161812ed;
-  border: 1px solid #e8e2cf32; border-radius: 2px;
-  font: 10px/1.1 ui-monospace, monospace; letter-spacing: .12em;
+  right: max(16px, env(safe-area-inset-right)); bottom: max(16px, env(safe-area-inset-bottom));
+  width: min(140px, calc(100vw - 32px));
+  color: #eee8d7; font: 500 11px/1.2 "Avenir Next", "Helvetica Neue", "Segoe UI", sans-serif;
+  text-shadow: 0 1px 4px #000, 0 0 8px #000;
 }
-.iso-readout, .iso-endpoints { display: flex; justify-content: space-between; align-items: baseline; }
-.iso-readout output { font-size: 13px; font-variant-numeric: tabular-nums; letter-spacing: .04em; }
-.iso-endpoints { color: #b4afa1; font-size: 7px; }
-.iso-scale { position: relative; display: grid; align-items: center; height: 24px; }
-.iso-scale::before {
+.ei-readout { display: flex; align-items: baseline; justify-content: space-between; letter-spacing: .16em; }
+.ei-readout output { color: #e1c988; font-size: 16px; font-variant-numeric: tabular-nums; letter-spacing: .03em; }
+.ei-scale { position: relative; display: grid; align-items: center; height: 26px; }
+.ei-scale::before {
   content: ""; position: absolute; inset-inline: 3px; height: 3px;
   background: linear-gradient(to right,
-    #282923 calc(4% + var(--tone-shift, 0%)),
-    #827f72 calc(50% + var(--tone-shift, 0%)),
-    #eae5d4 calc(96% + var(--tone-shift, 0%)));
-  outline: 1px solid #eeead51f;
+    #242520 calc(4% + var(--tone-shift, 0%)),
+    #8b8470 calc(50% + var(--tone-shift, 0%)),
+    #eee8d7 calc(96% + var(--tone-shift, 0%)));
+  box-shadow: 0 1px 3px #000a;
 }
-.iso-track {
-  position: relative; z-index: 1; display: block; width: 100%; height: 24px; margin: 0;
+.ei-track {
+  position: relative; display: block; width: 100%; height: 26px; margin: 0;
   appearance: none; background: transparent; cursor: ew-resize;
 }
-.iso-track::-webkit-slider-thumb {
-  appearance: none; width: 6px; height: 12px;
-  background: #eee9db; border: 1px solid #24251f; border-radius: 1px;
+.ei-track::-webkit-slider-thumb {
+  appearance: none; width: 5px; height: 12px;
+  background: #e1c988; border: 1px solid #181913; border-radius: 0;
 }
-.iso-track::-moz-range-thumb {
-  width: 5px; height: 11px; box-sizing: content-box;
-  background: #eee9db; border: 1px solid #24251f; border-radius: 1px;
+.ei-track::-moz-range-thumb {
+  width: 4px; height: 10px; background: #e1c988; border: 1px solid #181913; border-radius: 0;
 }
-.iso-track:focus-visible { outline: 1px solid #eae5d4; outline-offset: 2px; }
+.ei-track:focus-visible { outline: 1px solid #eee8d7; outline-offset: 2px; }
 .folder-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); grid-template-rows: repeat(2,minmax(0,1fr)); gap: 1px; min-height: max(380px, calc(100svh - 76px)); }
 .folder-tile { display: block; min-width: 0; position: relative; isolation: isolate; overflow: hidden; background: #24251f; }
 .folder-tile::after { content: ""; position: absolute; inset: 0; background: #08090755; pointer-events: none; }
@@ -75,15 +72,16 @@ a:focus-visible, button:focus-visible { outline: 2px solid #dad7be; outline-offs
 .folder-cover.is-playing .cover-preview { opacity: 1; }
 #personal-preview { object-fit: contain; background: #0b0c08; }
 .cover-toggle {
-  display: grid; place-items: center; position: absolute; left: 12px; bottom: 12px; z-index: 2;
-  width: 38px; height: 38px; border: 1px solid #e8e2cf65; border-radius: 50%;
-  color: #eee9db; background: #131610b8; cursor: pointer;
+  display: grid; place-items: center; position: absolute; left: 50%; top: 8px; z-index: 2;
+  transform: translateX(-50%); width: 44px; height: 44px; padding: 0;
+  border: 0; color: #f4eddb; background: transparent; cursor: pointer;
 }
-.cover-toggle:hover { background: #131610; }
-.cover-toggle:focus-visible { outline: 2px solid #eae5d4; outline-offset: 3px; }
+.cover-toggle:hover { color: #e1c988; }
+.cover-toggle:focus-visible { outline: 1px solid #eee8d7; outline-offset: -6px; }
 .cover-toggle::before {
   content: ""; width: 0; height: 0; margin-inline-start: 2px;
   border-block: 5px solid transparent; border-inline-start: 8px solid currentColor;
+  filter: drop-shadow(0 1px 3px #000);
 }
 .cover-toggle[data-playing]::before { width: 8px; height: 8px; margin: 0; border: 0; background: currentColor; }
 .folder-tile:hover img { transform: scale(1.02); }
@@ -192,16 +190,15 @@ a:focus-visible, button:focus-visible { outline: 2px solid #dad7be; outline-offs
 <section class="home" id="work" aria-label="Work">
 <nav class="folder-grid" aria-label="Work folders">
   <div class="folder-cover">
-    <a class="folder-tile" href="#commercial"><img src="./media/run-alone-still-3.webp" alt="" decoding="async"><video class="cover-preview" id="commercial-preview" data-preview="./media/commercial-preview.mp4" muted playsinline preload="none" aria-hidden="true"></video><span class="folder-label"><time datetime="2026">2026</time>Commercial</span></a>
-    <button type="button" class="cover-toggle" data-label="Commercial" aria-controls="commercial-preview" aria-label="Play Commercial preview" hidden></button>
+    <a class="folder-tile" href="#commercial"><img src="./media/run-alone-still-3.webp" alt="" decoding="async"><video class="cover-preview" id="commercial-preview" data-preview="./media/commercial-preview.mp4?v=full-sequence" muted playsinline preload="none" aria-hidden="true"></video><span class="folder-label"><time datetime="2026">2026</time>Commercial</span></a>
   </div>
   <div class="folder-cover">
-    <a class="folder-tile" href="#personal"><img src="./media/victor-still-4.webp" alt="" decoding="async"><video class="cover-preview" id="personal-preview" data-preview="./media/personal-preview.mp4" muted playsinline preload="none" aria-hidden="true"></video><span class="folder-label"><time datetime="2026">2026</time>Personal Work</span></a>
-    <button type="button" class="cover-toggle" data-label="Personal Work" aria-controls="personal-preview" aria-label="Play Personal Work preview" hidden></button>
+    <a class="folder-tile" href="#personal"><img src="./media/victor-still-4.webp" alt="" decoding="async"><video class="cover-preview" id="personal-preview" data-preview="./media/personal-preview.mp4?v=full-sequence" muted playsinline preload="none" aria-hidden="true"></video><span class="folder-label"><time datetime="2026">2026</time>Personal Work</span></a>
   </div>
   <div class="folder-tile folder-locked" aria-disabled="true"><span class="folder-label"><time datetime="2027">2027</time>Commercial</span></div>
   <div class="folder-tile folder-locked" aria-disabled="true"><span class="folder-label"><time datetime="2027">2027</time>Personal Work</span></div>
 </nav>
+  <button type="button" class="cover-toggle" aria-controls="commercial-preview personal-preview" aria-label="Play cover previews" hidden></button>
 </section>
 <section class="folder-view" id="commercial" hidden aria-labelledby="commercial-title" data-title="2026 Commercial">
 <h1 id="commercial-title" tabindex="-1">2026 Commercial</h1>
@@ -382,82 +379,93 @@ a:focus-visible, button:focus-visible { outline: 2px solid #dad7be; outline-offs
 </section>
 </main>
 </div>
-<div class="iso-control" role="group" aria-label="Screen brightness" hidden>
-  <div class="iso-readout"><label for="screen-iso">ISO</label><output for="screen-iso">800</output></div>
-  <div class="iso-scale">
-    <input class="iso-track" id="screen-iso" type="range" min="0" max="6" step="1" value="3" aria-valuetext="ISO 800">
+<div class="ei-control" role="group" aria-label="Screen brightness" hidden>
+  <div class="ei-readout"><label for="screen-ei" aria-label="Exposure index">EI</label><output for="screen-ei">800</output></div>
+  <div class="ei-scale">
+    <input class="ei-track" id="screen-ei" type="range" min="0" max="6" step="1" value="3" aria-valuetext="EI 800">
   </div>
-  <div class="iso-endpoints" aria-hidden="true"><span>SHADOW</span><span>HIGHLIGHT</span></div>
 </div>
 <script>const home = document.querySelector('.home');
 const exposureView = document.querySelector('.exposure-view');
-const isoControl = document.querySelector('.iso-control');
-const iso = document.querySelector('#screen-iso');
-const isoReadout = isoControl.querySelector('output');
+const eiControl = document.querySelector('.ei-control');
+const ei = document.querySelector('#screen-ei');
+const eiReadout = eiControl.querySelector('output');
 const brightnessByStop = [0.58, 0.7, 0.84, 1, 1.16, 1.34, 1.56];
 
 function setExposure() {
-  const stop = iso.valueAsNumber;
+  const stop = ei.valueAsNumber;
   const value = 100 * 2 ** stop;
   const brightness = brightnessByStop[stop];
   exposureView.style.setProperty('--site-brightness', brightness);
-  exposureView.toggleAttribute('data-iso-adjusted', brightness !== 1);
-  isoReadout.value = value;
-  iso.setAttribute('aria-valuetext', 'ISO ' + value);
-  isoControl.style.setProperty('--tone-shift', (3 - stop) * 8 + '%');
+  exposureView.toggleAttribute('data-ei-adjusted', brightness !== 1);
+  eiReadout.value = value;
+  ei.setAttribute('aria-valuetext', 'EI ' + value);
+  eiControl.style.setProperty('--tone-shift', (3 - stop) * 8 + '%');
 }
 
-iso.addEventListener('input', setExposure);
+ei.addEventListener('input', setExposure);
 setExposure();
-isoControl.hidden = false;
+eiControl.hidden = false;
 
-let stopActivePreview;
-for (const cover of home.querySelectorAll('.folder-cover')) {
-  const video = cover.querySelector('.cover-preview');
-  const button = cover.querySelector('.cover-toggle');
-  const label = button.dataset.label;
-  let attempt = 0;
+const previewButton = home.querySelector('.cover-toggle');
+const previews = [...home.querySelectorAll('.cover-preview')];
+const activePreviews = new Set();
+let playAttempt = 0;
 
-  function setButton(playing) {
-    button.toggleAttribute('data-playing', playing);
-    button.setAttribute('aria-label', (playing ? 'Stop ' : 'Play ') + label + ' preview');
-    button.title = button.getAttribute('aria-label');
+function updatePreviewButton() {
+  const playing = activePreviews.size > 0;
+  previewButton.toggleAttribute('data-playing', playing);
+  previewButton.setAttribute('aria-label', playing ? 'Stop cover previews' : 'Play cover previews');
+  previewButton.title = previewButton.getAttribute('aria-label');
+}
+
+function resetPreview(video) {
+  activePreviews.delete(video);
+  video.pause();
+  if (video.readyState > 0) video.currentTime = 0;
+  video.closest('.folder-cover').classList.remove('is-playing');
+}
+
+function stopPreviews() {
+  ++playAttempt;
+  for (const video of previews) resetPreview(video);
+  updatePreviewButton();
+}
+
+for (const video of previews) {
+  const cover = video.closest('.folder-cover');
+  video.addEventListener('playing', () => {
+    if (activePreviews.has(video)) cover.classList.add('is-playing');
+  });
+  const finish = () => {
+    resetPreview(video);
+    updatePreviewButton();
+  };
+  video.addEventListener('ended', finish);
+  video.addEventListener('error', finish);
+}
+previewButton.addEventListener('click', () => {
+  if (activePreviews.size) {
+    stopPreviews();
+    return;
   }
-
-  function stop() {
-    ++attempt;
-    video.pause();
-    if (video.readyState > 0) video.currentTime = 0;
-    cover.classList.remove('is-playing');
-    setButton(false);
-    if (stopActivePreview === stop) stopActivePreview = undefined;
-  }
-
-  button.addEventListener('click', () => {
-    if (stopActivePreview === stop) {
-      stop();
-      return;
-    }
-    stopActivePreview?.();
-    stopActivePreview = stop;
-    const playingAttempt = ++attempt;
-    setButton(true);
+  const attempt = ++playAttempt;
+  for (const video of previews) activePreviews.add(video);
+  updatePreviewButton();
+  for (const video of previews) {
     video.muted = true;
     if (!video.hasAttribute('src')) video.src = video.dataset.preview;
     video.play().catch(() => {
-      if (playingAttempt === attempt) stop();
+      if (attempt === playAttempt) {
+        resetPreview(video);
+        updatePreviewButton();
+      }
     });
-  });
-  video.addEventListener('playing', () => {
-    if (stopActivePreview === stop) cover.classList.add('is-playing');
-  });
-  video.addEventListener('ended', stop);
-  video.addEventListener('error', stop);
-  setButton(false);
-  button.hidden = false;
-}
+  }
+});
+previewButton.hidden = false;
 document.addEventListener('visibilitychange', () => {
-  if (document.hidden) stopActivePreview?.();
+  if (document.hidden) stopPreviews();
 });
 
 const folders = [...document.querySelectorAll('.folder-view')];
@@ -482,7 +490,7 @@ function route() {
     }
   }
   home.hidden = Boolean(folder) || isContact;
-  if (home.hidden) stopActivePreview?.();
+  if (home.hidden && activePreviews.size) stopPreviews();
   contact.hidden = !isContact;
   for (const link of navLinks) {
     if (link.hash === (isContact ? '#contact' : '#work')) link.setAttribute('aria-current', 'page');
