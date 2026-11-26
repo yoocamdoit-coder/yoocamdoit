@@ -28,6 +28,8 @@ jobs:
           unzip -q site.zip -d public
           cp index.html public/index.html
           test -f public/media/howfar.mp4
+          command -v ffmpeg >/dev/null || (sudo apt-get update && sudo apt-get install -y ffmpeg)
+          python3 scripts/render-cover-previews.py public/media
       - uses: actions/upload-pages-artifact@v4
         with:
           name: github-pages
