@@ -207,7 +207,7 @@ html[data-iris-loading] .exposure-view, html[data-iris-loading] .ei-control, htm
   const center = 72;
   const ridge = 58;
   const pivotRadius = 57;
-  const bladeCount = 15;
+  const bladeCount = 6;
   const step = 2 * Math.PI / bladeCount;
   const start = performance.now();
   let ready = false;
@@ -220,7 +220,7 @@ html[data-iris-loading] .exposure-view, html[data-iris-loading] .ei-control, htm
   function draw(progress) {
     const eased = progress * progress * (3 - 2 * progress);
     const pivotAngle = -Math.PI / 2;
-    const swing = (6 + 56 * eased) * Math.PI / 180;
+    const swing = (6 + 48 * eased) * Math.PI / 180;
     const firstNormal = pivotAngle + Math.PI / 2 - swing;
     const openingRadius = pivotRadius * Math.sin(swing) / Math.cos(step / 2);
     const corners = Array.from({ length: bladeCount }, (_, i) =>
@@ -264,8 +264,7 @@ html[data-iris-loading] .exposure-view, html[data-iris-loading] .ei-control, htm
     ctx.moveTo(...corners[0]);
     for (const corner of corners.slice(1)) ctx.lineTo(...corner);
     ctx.closePath();
-    ctx.lineWidth = 1.4;
-    ctx.stroke();
+    ctx.fill();
     ctx.restore();
   }
 
