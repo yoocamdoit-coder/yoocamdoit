@@ -239,8 +239,13 @@ html[data-iris-loading] .exposure-view, html[data-iris-loading] .ei-control, htm
     ctx.save();
     ctx.beginPath();
     ctx.arc(center, center, ridge, 0, 2 * Math.PI);
-    ctx.clip();
+    ctx.moveTo(...corners[0]);
+    for (const corner of corners.slice(1)) ctx.lineTo(...corner);
+    ctx.closePath();
+    ctx.clip('evenodd');
+    ctx.fillRect(0, 0, 144, 144);
 
+    ctx.fillStyle = '#000';
     for (let i = 0; i < bladeCount; i++) {
       const axis = pivotAngle + i * step;
       const [x, y] = point(pivotRadius, axis);
@@ -260,11 +265,6 @@ html[data-iris-loading] .exposure-view, html[data-iris-loading] .ei-control, htm
       ctx.fill();
     }
 
-    ctx.beginPath();
-    ctx.moveTo(...corners[0]);
-    for (const corner of corners.slice(1)) ctx.lineTo(...corner);
-    ctx.closePath();
-    ctx.fill();
     ctx.restore();
   }
 
