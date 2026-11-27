@@ -183,13 +183,13 @@ a:focus-visible, button:focus-visible { outline: 2px solid #dad7be; outline-offs
 .iris-loader {
   position: fixed; inset: 0; z-index: 30;
   display: grid; place-items: center;
-  background: #0b0b0b; color: #f3f3f3;
-  font: 500 13px/1 ui-monospace, monospace;
+  background: #000; color: #fff;
+  font: 500 11px/1 ui-monospace, monospace;
   opacity: 1; transition: opacity 240ms ease;
 }
 .iris-loader.is-open { opacity: 0; pointer-events: none; }
-.iris-loader-figure { display: grid; justify-items: center; gap: 16px; }
-.iris-loader canvas { display: block; width: 144px; height: 144px; }
+.iris-loader-figure { display: grid; justify-items: center; gap: 10px; }
+.iris-loader canvas { display: block; width: 84px; height: 84px; }
 .iris-loader output { letter-spacing: .17em; font-variant-numeric: tabular-nums; }
 html[data-iris-loading] { overflow: hidden; }
 html[data-iris-loading] .exposure-view, html[data-iris-loading] .ei-control, html[data-iris-loading] .skip { visibility: hidden; }
@@ -212,40 +212,59 @@ html[data-iris-loading] .exposure-view, html[data-iris-loading] .ei-control, htm
   if (!ctx) return;
 
   const center = 72;
-  const radius = 51;
-  const bladeAngle = Math.PI / 3;
-  const colors = ['#cccccc', '#9c9c9c', '#686868', '#454545', '#747474', '#a8a8a8'];
+  const radius = 58;
+  const bladeCount = 9;
+  const step = 2 * Math.PI / bladeCount;
   const start = performance.now();
   let ready = false;
   let shown = -1;
   let finishStart;
 
+  function point(r, angle) {
+    return [center + r * Math.cos(angle), center + r * Math.sin(angle)];
+  }
+
   function draw(progress) {
-    const opening = 3 + 47 * progress;
-    const rotation = -Math.PI / 2 + progress * 0.34;
-    const bladeSweep = 0.38 * (1 - progress);
+    const eased = 1 - (1 - progress) ** 2;
+    const opening = 5 + 45 * eased;
+    const rotation = -Math.PI / 2 + eased * 0.24;
     ctx.clearRect(0, 0, 144, 144);
-    ctx.lineWidth = 0.7;
-    ctx.strokeStyle = '#505050';
-    for (const r of [57, 62]) {
+
+    ctx.beginPath();
+    ctx.arc(center, center, 64, 0, 2 * Math.PI);
+    ctx.strokeStyle = '#fff';
+    ctx.lineWidth = 1.25;
+    ctx.stroke();
+
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(center, center, radius, 0, 2 * Math.PI);
+    ctx.clip();
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(0, 0, 144, 144);
+
+    ctx.strokeStyle = '#000';
+    ctx.lineWidth = 1.8;
+    for (let i = 0; i < bladeCount; i++) {
+      const pivot = -Math.PI / 2 + i * step;
+      const edge = rotation + i * step;
       ctx.beginPath();
-      ctx.arc(center, center, r, 0, 2 * Math.PI);
+      ctx.moveTo(...point(radius, pivot - 0.54));
+      ctx.bezierCurveTo(
+        ...point(radius * 0.74, pivot - 0.42),
+        ...point(opening + (radius - opening) * 0.48, edge - 0.51),
+        ...point(opening, edge)
+      );
       ctx.stroke();
     }
-    ctx.strokeStyle = '#151515';
-    ctx.lineWidth = 1;
-    for (let i = 0; i < colors.length; i++) {
-      const a = rotation + i * bladeAngle;
-      const b = a + bladeAngle;
-      ctx.beginPath();
-      ctx.arc(center, center, radius, a - bladeSweep, b - bladeSweep);
-      ctx.lineTo(center + opening * Math.cos(b), center + opening * Math.sin(b));
-      ctx.lineTo(center + opening * Math.cos(a), center + opening * Math.sin(a));
-      ctx.closePath();
-      ctx.fillStyle = colors[i];
-      ctx.fill();
-      ctx.stroke();
-    }
+
+    ctx.beginPath();
+    ctx.moveTo(...point(opening, rotation));
+    for (let i = 1; i < bladeCount; i++) ctx.lineTo(...point(opening, rotation + i * step));
+    ctx.closePath();
+    ctx.fillStyle = '#000';
+    ctx.fill();
+    ctx.restore();
   }
 
   function tick(now) {
