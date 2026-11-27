@@ -184,40 +184,33 @@ a:focus-visible, button:focus-visible { outline: 2px solid #dad7be; outline-offs
   position: fixed; inset: 0; z-index: 30;
   display: grid; place-items: center;
   background: #000; color: #fff;
-  font: 500 11px/1 ui-monospace, monospace;
   opacity: 1; transition: opacity 240ms ease;
 }
 .iris-loader.is-open { opacity: 0; pointer-events: none; }
-.iris-loader-figure { display: grid; justify-items: center; gap: 10px; }
 .iris-loader canvas { display: block; width: 84px; height: 84px; }
-.iris-loader output { letter-spacing: .17em; font-variant-numeric: tabular-nums; }
 html[data-iris-loading] { overflow: hidden; }
 html[data-iris-loading] .exposure-view, html[data-iris-loading] .ei-control, html[data-iris-loading] .skip { visibility: hidden; }
 </style>
 </head>
 <body>
 <div id="iris-loader" class="iris-loader" role="status" aria-label="Loading portfolio" hidden>
-  <div class="iris-loader-figure" aria-hidden="true">
-    <canvas width="288" height="288"></canvas>
-    <output>000</output>
-  </div>
+  <canvas width="288" height="288" aria-hidden="true"></canvas>
 </div>
 <script>
 (() => {
   if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   const loader = document.getElementById('iris-loader');
   const canvas = loader.querySelector('canvas');
-  const counter = loader.querySelector('output');
   const ctx = canvas.getContext('2d');
   if (!ctx) return;
 
   const center = 72;
-  const radius = 58;
+  const ridge = 58;
+  const pivotRadius = 57;
   const bladeCount = 9;
   const step = 2 * Math.PI / bladeCount;
   const start = performance.now();
   let ready = false;
-  let shown = -1;
   let finishStart;
 
   function point(r, angle) {
@@ -225,9 +218,15 @@ html[data-iris-loading] .exposure-view, html[data-iris-loading] .ei-control, htm
   }
 
   function draw(progress) {
-    const eased = 1 - (1 - progress) ** 2;
-    const opening = 5 + 45 * eased;
-    const rotation = -Math.PI / 2 + eased * 0.24;
+    const eased = progress * progress * (3 - 2 * progress);
+    const pivotAngle = -Math.PI / 2;
+    const swing = (4 + 49 * eased) * Math.PI / 180;
+    // Each straight blade edge rotates around its fixed outer pin.
+    // Adjacent edges intersect at the vertices of the opening.
+    const firstNormal = pivotAngle + Math.PI / 2 - swing;
+    const edgeDistance = pivotRadius * Math.sin(swing);
+    const cornerRadius = edgeDistance / Math.cos(step / 2);
+    const firstCorner = firstNormal - step / 2;
     ctx.clearRect(0, 0, 144, 144);
 
     ctx.beginPath();
@@ -238,29 +237,28 @@ html[data-iris-loading] .exposure-view, html[data-iris-loading] .ei-control, htm
 
     ctx.save();
     ctx.beginPath();
-    ctx.arc(center, center, radius, 0, 2 * Math.PI);
+    ctx.arc(center, center, ridge, 0, 2 * Math.PI);
     ctx.clip();
     ctx.fillStyle = '#fff';
     ctx.fillRect(0, 0, 144, 144);
-
     ctx.strokeStyle = '#000';
     ctx.lineWidth = 1.8;
+
     for (let i = 0; i < bladeCount; i++) {
-      const pivot = -Math.PI / 2 + i * step;
-      const edge = rotation + i * step;
+      const offset = i * step;
+      const [x, y] = point(pivotRadius, pivotAngle + offset);
+      const edgeDirection = pivotAngle + offset - swing;
       ctx.beginPath();
-      ctx.moveTo(...point(radius, pivot - 0.54));
-      ctx.bezierCurveTo(
-        ...point(radius * 0.74, pivot - 0.42),
-        ...point(opening + (radius - opening) * 0.48, edge - 0.51),
-        ...point(opening, edge)
-      );
+      ctx.moveTo(x + 8 * Math.cos(edgeDirection), y + 8 * Math.sin(edgeDirection));
+      ctx.lineTo(...point(cornerRadius, firstCorner + offset));
       ctx.stroke();
     }
 
     ctx.beginPath();
-    ctx.moveTo(...point(opening, rotation));
-    for (let i = 1; i < bladeCount; i++) ctx.lineTo(...point(opening, rotation + i * step));
+    ctx.moveTo(...point(cornerRadius, firstCorner));
+    for (let i = 1; i < bladeCount; i++) {
+      ctx.lineTo(...point(cornerRadius, firstCorner + i * step));
+    }
     ctx.closePath();
     ctx.fillStyle = '#000';
     ctx.fill();
@@ -269,25 +267,19 @@ html[data-iris-loading] .exposure-view, html[data-iris-loading] .ei-control, htm
 
   function tick(now) {
     const elapsed = now - start;
-    let progress = Math.min(90, Math.floor(elapsed / 8.5));
+    let progress = 0.90 * Math.min(1, elapsed / 690);
     if (finishStart !== undefined) {
-      progress = Math.min(100, 90 + Math.floor((now - finishStart) / 11));
-    } else if (elapsed >= 765 && (ready || elapsed >= 2300)) {
+      progress += 0.10 * Math.min(1, (now - finishStart) / 140);
+    } else if (elapsed >= 690 && (ready || elapsed >= 2300)) {
       finishStart = now;
     }
-    if (progress !== shown) {
-      shown = progress;
-      counter.value = String(progress).padStart(3, '0');
-      draw(progress / 100);
-    }
-    if (progress < 100) {
+    draw(progress);
+    if (progress < 1) {
       requestAnimationFrame(tick);
     } else {
-      setTimeout(() => {
-        loader.classList.add('is-open');
-        document.documentElement.removeAttribute('data-iris-loading');
-        setTimeout(() => { loader.hidden = true; }, 250);
-      }, 80);
+      loader.classList.add('is-open');
+      document.documentElement.removeAttribute('data-iris-loading');
+      setTimeout(() => { loader.hidden = true; }, 250);
     }
   }
 
