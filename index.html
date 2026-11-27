@@ -180,9 +180,115 @@ a:focus-visible, button:focus-visible { outline: 2px solid #dad7be; outline-offs
 .folder-locked { cursor: default; }
 .folder-locked img { filter: saturate(.35) brightness(.56); }
 .folder-locked:hover img { transform: none; }
+.iris-loader {
+  position: fixed; inset: 0; z-index: 30;
+  display: grid; place-items: center;
+  background: #0b0b0b; color: #f3f3f3;
+  font: 500 13px/1 ui-monospace, monospace;
+  opacity: 1; transition: opacity 240ms ease;
+}
+.iris-loader.is-open { opacity: 0; pointer-events: none; }
+.iris-loader-figure { display: grid; justify-items: center; gap: 16px; }
+.iris-loader canvas { display: block; width: 144px; height: 144px; }
+.iris-loader output { letter-spacing: .17em; font-variant-numeric: tabular-nums; }
+html[data-iris-loading] { overflow: hidden; }
+html[data-iris-loading] .exposure-view, html[data-iris-loading] .ei-control, html[data-iris-loading] .skip { visibility: hidden; }
 </style>
 </head>
 <body>
+<div id="iris-loader" class="iris-loader" role="status" aria-label="Loading portfolio" hidden>
+  <div class="iris-loader-figure" aria-hidden="true">
+    <canvas width="288" height="288"></canvas>
+    <output>000</output>
+  </div>
+</div>
+<script>
+(() => {
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const loader = document.getElementById('iris-loader');
+  const canvas = loader.querySelector('canvas');
+  const counter = loader.querySelector('output');
+  const ctx = canvas.getContext('2d');
+  if (!ctx) return;
+
+  const center = 72;
+  const radius = 51;
+  const bladeAngle = Math.PI / 3;
+  const colors = ['#cccccc', '#9c9c9c', '#686868', '#454545', '#747474', '#a8a8a8'];
+  const start = performance.now();
+  let ready = false;
+  let shown = -1;
+  let finishStart;
+
+  function draw(progress) {
+    const opening = 3 + 47 * progress;
+    const rotation = -Math.PI / 2 + progress * 0.34;
+    const bladeSweep = 0.38 * (1 - progress);
+    ctx.clearRect(0, 0, 144, 144);
+    ctx.lineWidth = 0.7;
+    ctx.strokeStyle = '#505050';
+    for (const r of [57, 62]) {
+      ctx.beginPath();
+      ctx.arc(center, center, r, 0, 2 * Math.PI);
+      ctx.stroke();
+    }
+    ctx.strokeStyle = '#151515';
+    ctx.lineWidth = 1;
+    for (let i = 0; i < colors.length; i++) {
+      const a = rotation + i * bladeAngle;
+      const b = a + bladeAngle;
+      ctx.beginPath();
+      ctx.arc(center, center, radius, a - bladeSweep, b - bladeSweep);
+      ctx.lineTo(center + opening * Math.cos(b), center + opening * Math.sin(b));
+      ctx.lineTo(center + opening * Math.cos(a), center + opening * Math.sin(a));
+      ctx.closePath();
+      ctx.fillStyle = colors[i];
+      ctx.fill();
+      ctx.stroke();
+    }
+  }
+
+  function tick(now) {
+    const elapsed = now - start;
+    let progress = Math.min(90, Math.floor(elapsed / 8.5));
+    if (finishStart !== undefined) {
+      progress = Math.min(100, 90 + Math.floor((now - finishStart) / 11));
+    } else if (elapsed >= 765 && (ready || elapsed >= 2300)) {
+      finishStart = now;
+    }
+    if (progress !== shown) {
+      shown = progress;
+      counter.value = String(progress).padStart(3, '0');
+      draw(progress / 100);
+    }
+    if (progress < 100) {
+      requestAnimationFrame(tick);
+    } else {
+      setTimeout(() => {
+        loader.classList.add('is-open');
+        document.documentElement.removeAttribute('data-iris-loading');
+        setTimeout(() => { loader.hidden = true; }, 250);
+      }, 80);
+    }
+  }
+
+  function prepare() {
+    if (location.hash && location.hash !== '#work') {
+      ready = true;
+      return;
+    }
+    const covers = [...document.querySelectorAll('.folder-cover img')];
+    Promise.allSettled(covers.map(img => img.decode())).then(() => { ready = true; });
+  }
+
+  ctx.scale(2, 2);
+  loader.hidden = false;
+  document.documentElement.setAttribute('data-iris-loading', '');
+  document.addEventListener('DOMContentLoaded', prepare, { once: true });
+  draw(0);
+  requestAnimationFrame(tick);
+})();
+</script>
 <a class="skip" href="#main">Skip to content</a>
 <div class="exposure-view">
 <header class="masthead">
