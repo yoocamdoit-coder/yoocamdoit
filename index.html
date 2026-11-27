@@ -207,7 +207,7 @@ html[data-iris-loading] .exposure-view, html[data-iris-loading] .ei-control, htm
   const center = 72;
   const ridge = 58;
   const pivotRadius = 57;
-  const bladeCount = 9;
+  const bladeCount = 15;
   const step = 2 * Math.PI / bladeCount;
   const start = performance.now();
   let ready = false;
@@ -220,56 +220,51 @@ html[data-iris-loading] .exposure-view, html[data-iris-loading] .ei-control, htm
   function draw(progress) {
     const eased = progress * progress * (3 - 2 * progress);
     const pivotAngle = -Math.PI / 2;
-    const swing = (7 + 46 * eased) * Math.PI / 180;
+    const swing = (6 + 56 * eased) * Math.PI / 180;
     const firstNormal = pivotAngle + Math.PI / 2 - swing;
-    const edgeDistance = pivotRadius * Math.sin(swing);
-    const cornerRadius = edgeDistance / Math.cos(step / 2);
-    const firstCorner = firstNormal - step / 2;
-    const corners = Array.from({ length: bladeCount }, (_, i) => point(cornerRadius, firstCorner + i * step));
+    const openingRadius = pivotRadius * Math.sin(swing) / Math.cos(step / 2);
+    const corners = Array.from({ length: bladeCount }, (_, i) =>
+      point(openingRadius, firstNormal + (i - 0.5) * step)
+    );
     ctx.clearRect(0, 0, 144, 144);
+    ctx.fillStyle = '#fff';
+    ctx.strokeStyle = '#fff';
+    ctx.lineJoin = 'miter';
 
     ctx.beginPath();
     ctx.arc(center, center, 63, 0, 2 * Math.PI);
-    ctx.strokeStyle = '#fff';
     ctx.lineWidth = 1.05;
     ctx.stroke();
 
     ctx.save();
     ctx.beginPath();
     ctx.arc(center, center, ridge, 0, 2 * Math.PI);
-    ctx.stroke();
     ctx.clip();
 
-    // Clip out the shared opening so the metal edges never cross it.
-    ctx.beginPath();
-    ctx.arc(center, center, ridge, 0, 2 * Math.PI);
-    ctx.moveTo(...corners[0]);
-    for (const corner of corners.slice(1)) ctx.lineTo(...corner);
-    ctx.closePath();
-    ctx.clip('evenodd');
-
-    ctx.lineWidth = 1.55;
-    ctx.lineJoin = 'miter';
     for (let i = 0; i < bladeCount; i++) {
       const axis = pivotAngle + i * step;
       const [x, y] = point(pivotRadius, axis);
       const tx = Math.cos(axis - swing);
       const ty = Math.sin(axis - swing);
+      const [tipX, tipY] = corners[(i + 1) % bladeCount];
 
-      // The heel and kink use fixed offsets on the rotating edge.
+      // Each tapered edge sits on a rigid blade that swings about its outer pin.
       ctx.beginPath();
-      ctx.moveTo(...corners[(i + 1) % bladeCount]);
-      ctx.lineTo(x - 10 * tx, y - 10 * ty);
-      ctx.lineTo(x + 9 * tx - 10 * ty, y + 9 * ty + 10 * tx);
-      ctx.stroke();
+      ctx.moveTo(tipX, tipY);
+      ctx.lineTo(x - 12 * tx, y - 12 * ty);
+      ctx.quadraticCurveTo(x - 3 * tx, y - 3 * ty, x + 5 * tx - 5 * ty, y + 5 * ty + 5 * tx);
+      ctx.quadraticCurveTo(x - 3 * tx - 0.9 * ty, y - 3 * ty + 0.9 * tx,
+        x - 12 * tx - 1.35 * ty, y - 12 * ty + 1.35 * tx);
+      ctx.lineTo(tipX - 0.85 * ty, tipY + 0.85 * tx);
+      ctx.closePath();
+      ctx.fill();
     }
 
-    // Bind the inner edge last to give the overlapping tips a sharp silhouette.
     ctx.beginPath();
     ctx.moveTo(...corners[0]);
     for (const corner of corners.slice(1)) ctx.lineTo(...corner);
     ctx.closePath();
-    ctx.lineWidth = 1.9;
+    ctx.lineWidth = 1.4;
     ctx.stroke();
     ctx.restore();
   }
