@@ -173,20 +173,27 @@ body[data-catalogue] .folder-locked { background: #0002; }
 body[data-catalogue] .folder-locked::after { content: none; }
 
 .scroll-cue {
-  position: absolute; left: 50%; bottom: 0;
-  width: min(200px, 42vw); height: calc(32px + env(safe-area-inset-bottom));
-  translate: -50% 0; pointer-events: none;
-  background: radial-gradient(ellipse at 50% 100%, #e6efff8f, #c1d7ff34 31%, transparent 71%);
-  opacity: .24;
-  animation: scroll-glow 3.8s .35s ease-in-out infinite;
+  position: absolute; inset: auto 0 0;
+  height: calc(clamp(36px, 7svh, 60px) + env(safe-area-inset-bottom));
+  pointer-events: none;
+  background: linear-gradient(
+    to top,
+    #edf4fff0 0,
+    #dceaff94 2px,
+    #c8ddff59 8px,
+    #c8ddff24 22px,
+    transparent 100%
+  );
+  opacity: .30;
+  animation: scroll-glow 3.6s .3s ease-in-out infinite;
 }
 .landing[data-scrolled] .scroll-cue { display: none; }
 @keyframes scroll-glow {
-  0%, 56%, 100% { opacity: .24; }
-  20% { opacity: .72; }
+  0%, 62%, 100% { opacity: .30; }
+  20% { opacity: .94; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .scroll-cue { animation: none; opacity: .54; }
+  .scroll-cue { animation: none; opacity: .64; }
 }
 
 .archive-view { min-height: 100vh; min-height: 100svh; background: var(--bg); }
