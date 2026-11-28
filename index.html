@@ -34,9 +34,8 @@ a:focus-visible, button:focus-visible { outline: 2px solid #dad7be; outline-offs
 .exposure-view[data-ei-adjusted] { filter: brightness(var(--site-brightness)); }
 /* The EI strip stays above the image so it never grades itself. */
 body { padding-bottom: calc(66px + env(safe-area-inset-bottom)); }
-body[data-landing] { padding-bottom: 0; }
 .ei-control {
-  position: fixed; z-index: 5; left: 0; right: 0; bottom: 0;
+  position: fixed; z-index: 5; left: 0; right: 0; bottom: 12px;
   padding: 4px max(8px, env(safe-area-inset-right)) env(safe-area-inset-bottom) max(8px, env(safe-area-inset-left));
   color: #fff; background: linear-gradient(transparent, #000e);
   font: 600 10px/1 "Arial Narrow", "Avenir Next Condensed", "Segoe UI", sans-serif;
@@ -50,7 +49,7 @@ body[data-landing] { padding-bottom: 0; }
 .ei-scale { position: relative; height: 30px; }
 .ei-zones {
   position: absolute; inset: 6px 0 9px;
-  display: grid; grid-template-columns: repeat(19, minmax(0, 1fr)); gap: 2px;
+  display: grid; grid-template-columns: repeat(var(--ei-steps), minmax(0, 1fr)); gap: 2px;
   pointer-events: none;
 }
 .ei-zones span {
@@ -66,8 +65,8 @@ body[data-landing] { padding-bottom: 0; }
   position: absolute; inset: 0; appearance: none; width: 100%; height: 100%; margin: 0;
   opacity: 0; cursor: ew-resize; touch-action: none;
 }
-.ei-track::-webkit-slider-thumb { appearance: none; width: calc(100vw / 19); height: 30px; }
-.ei-track::-moz-range-thumb { width: calc(100vw / 19); height: 30px; border: 0; }
+.ei-track::-webkit-slider-thumb { appearance: none; width: calc(100vw / var(--ei-steps)); height: 30px; }
+.ei-track::-moz-range-thumb { width: calc(100vw / var(--ei-steps)); height: 30px; border: 0; }
 .ei-scale:focus-within { outline: 1px solid #fff; outline-offset: -1px; }
 @media (forced-colors: active) {
   .ei-zones { display: none; }
@@ -187,49 +186,22 @@ body[data-landing] { padding-bottom: 0; }
 .folder-locked { cursor: default; }
 .folder-locked img { filter: saturate(.35) brightness(.56); }
 .folder-locked:hover img { transform: none; }
-body[data-landing] .masthead {
-  position: absolute; z-index: 2; inset: 0 0 auto;
-  background: linear-gradient(#000a, transparent);
-  padding-bottom: 24px; text-shadow: 0 1px 7px #000;
-}
-body[data-landing] .site-nav a, body[data-landing] .site-byline { color: var(--ink); }
 .landing { position: relative; height: 100vh; height: 100svh; overflow: hidden; background: #000; }
 .landing-film { display: block; width: 100%; height: 100%; object-fit: cover; }
-.landing-enter { position: absolute; inset: 0; display: grid; place-items: end center; }
-.landing-enter:focus-visible { outline-offset: -5px; }
-.landing-enter span {
-  margin: 0 12px calc(63px + env(safe-area-inset-bottom));
-  padding: 6px 10px; border: 1px solid #fff7; background: #0005;
-  color: #fff; text-shadow: 0 1px 4px #000; font-size: 11px; letter-spacing: .13em;
-}
-.landing-enter:hover span { border-color: #fff; }
-.iris-loader, .word-portal { position: fixed; inset: 0; z-index: 30; }
-.iris-loader canvas, .word-portal svg { display: block; width: 100%; height: 100%; }
-html[data-iris-loading], html[data-entering] { overflow: hidden; }
+.iris-loader { position: fixed; inset: 0; z-index: 30; }
+.iris-loader canvas { display: block; width: 100%; height: 100%; }
+html[data-iris-loading] { overflow: hidden; }
 html[data-iris-loading] body { background: #000; }
 html[data-iris-loading] .ei-control, html[data-iris-loading] .skip { visibility: hidden; }
-html[data-entering] .ei-control { pointer-events: none; }
-.word-portal { z-index: 29; overflow: hidden; pointer-events: none; }
-.word-portal svg { overflow: visible; }
-.portal-outline { fill: none; stroke: #fff; stroke-opacity: .82; stroke-width: 1.2; vector-effect: non-scaling-stroke; }
 </style>
 </head>
 <body>
 <div class="iris-loader" id="iris-loader" aria-hidden="true" hidden><canvas></canvas></div>
-<div class="word-portal" hidden aria-hidden="true">
-  <svg viewBox="0 0 1000 220">
-    <defs>
-      <text id="portal-word" x="500" y="162" text-anchor="middle" font-family="Arial, sans-serif" font-size="156" font-weight="900" letter-spacing="-7">yoocamdoit</text>
-      <mask id="portal-window" maskUnits="userSpaceOnUse" x="-10000" y="-10000" width="20000" height="20000">
-        <rect x="-10000" y="-10000" width="20000" height="20000" fill="white"/>
-        <use href="#portal-word" fill="black"/>
-      </mask>
-    </defs>
-    <rect x="-10000" y="-10000" width="20000" height="20000" fill="black" mask="url(#portal-window)"/>
-    <text class="portal-outline" x="500" y="162" text-anchor="middle" font-family="Arial, sans-serif" font-size="156" font-weight="900" letter-spacing="-7">yoocamdoit</text>
-  </svg>
-</div>
 <a class="skip" href="#main">Skip to content</a>
+<section class="landing" id="intro" aria-label="Selected films" tabindex="-1" hidden>
+  <video class="landing-film" poster="./media/run-alone-thumbnail.jpg" data-source="./media/run-alone.mp4" muted playsinline preload="auto" aria-label="Run Alone, But Never Alone"></video>
+  <video class="landing-film" poster="./media/victor-thumbnail.jpg" data-source="./media/victor.mp4" muted playsinline preload="auto" aria-label="Victor" hidden></video>
+</section>
 <div class="exposure-view">
 <header class="masthead">
   <a class="site-name" id="site-name" href="#">yoocamdoit</a>
@@ -240,10 +212,6 @@ html[data-entering] .ei-control { pointer-events: none; }
   <p class="site-byline">Gwanyeol Yoo, Seoul based Director of Photography</p>
 </header>
 <main id="main" class="shell" tabindex="-1">
-<section class="landing" id="intro" aria-label="Run Alone, But Never Alone" hidden>
-  <video class="landing-film" poster="./media/run-alone-still-3.webp" data-source="./media/commercial-preview.mp4?v=athlete-to-back" muted playsinline preload="auto" aria-hidden="true"></video>
-  <a class="landing-enter" href="#work"><span>View Work</span></a>
-</section>
 <section class="home" id="work" tabindex="-1" aria-label="Work">
 <nav class="folder-grid" aria-label="Work folders">
   <div class="folder-cover">
@@ -439,8 +407,8 @@ html[data-entering] .ei-control { pointer-events: none; }
 <div class="ei-control" role="group" aria-label="Screen brightness" hidden>
   <div class="ei-readout"><label for="screen-ei" aria-label="Exposure index">EI</label><output for="screen-ei">800</output></div>
   <div class="ei-scale">
-    <div class="ei-zones" aria-hidden="true"><span style="--zone-tone:#121212"></span><span style="--zone-tone:#1b1b1b"></span><span style="--zone-tone:#252525"></span><span style="--zone-tone:#313131"></span><span style="--zone-tone:#3e3e3e"></span><span style="--zone-tone:#4c4c4c"></span><span style="--zone-tone:#5b5b5b"></span><span style="--zone-tone:#6b6b6b"></span><span style="--zone-tone:#7b7b7b"></span><span style="--zone-tone:#8c8c8c" data-selected></span><span style="--zone-tone:#9d9d9d"></span><span style="--zone-tone:#aeaeae"></span><span style="--zone-tone:#bfbfbf"></span><span style="--zone-tone:#cfcfcf"></span><span style="--zone-tone:#dddddd"></span><span style="--zone-tone:#e9e9e9"></span><span style="--zone-tone:#f2f2f2"></span><span style="--zone-tone:#f9f9f9"></span><span style="--zone-tone:#ffffff"></span></div>
-    <input class="ei-track" id="screen-ei" type="range" min="0" max="18" step="1" value="9" aria-valuetext="EI 800">
+    <div class="ei-zones" aria-hidden="true"></div>
+    <input class="ei-track" id="screen-ei" type="range" min="0" max="36" step="1" value="18" aria-valuetext="EI 800">
   </div>
 </div>
 <script>const home = document.querySelector('.home');
@@ -448,9 +416,27 @@ const exposureView = document.querySelector('.exposure-view');
 const eiControl = document.querySelector('.ei-control');
 const ei = document.querySelector('#screen-ei');
 const eiReadout = eiControl.querySelector('output');
-const eiZones = [...eiControl.querySelectorAll('.ei-zones span')];
-const exposureIndexes = [100, 125, 160, 200, 250, 320, 400, 500, 640, 800, 1000, 1250, 1600, 2000, 2500, 3200, 4000, 5000, 6400];
-const brightnessByStop = [0.68, 0.73, 0.79, 0.85, 0.91, 0.97, 1.04, 1.11, 1.18, 1.25, 1.32, 1.39, 1.46, 1.54, 1.62, 1.70, 1.78, 1.86, 1.95];
+const eiScale = eiControl.querySelector('.ei-zones');
+const baseIndexes = [100, 125, 160, 200, 250, 320, 400, 500, 640, 800, 1000, 1250, 1600, 2000, 2500, 3200, 4000, 5000, 6400];
+const baseBrightness = [0.68, 0.73, 0.79, 0.85, 0.91, 0.97, 1.04, 1.11, 1.18, 1.25, 1.32, 1.39, 1.46, 1.54, 1.62, 1.70, 1.78, 1.86, 1.95];
+const exposureIndexes = baseIndexes.flatMap((value, index) => {
+  const next = baseIndexes[index + 1];
+  if (next === undefined) return [value];
+  const increment = value >= 1000 ? 50 : 5;
+  return [value, Math.round(Math.sqrt(value * next) / increment) * increment];
+});
+const brightnessByStop = baseBrightness.flatMap((value, index) => {
+  const next = baseBrightness[index + 1];
+  return next === undefined ? [value] : [value, (value + next) / 2];
+});
+const eiZones = exposureIndexes.map((_, index) => {
+  const zone = document.createElement('span');
+  const tone = Math.round(18 + 237 * index / (exposureIndexes.length - 1));
+  zone.style.setProperty('--zone-tone', 'rgb(' + tone + ' ' + tone + ' ' + tone + ')');
+  eiScale.append(zone);
+  return zone;
+});
+eiControl.style.setProperty('--ei-steps', eiZones.length);
 
 function setExposure() {
   const stop = ei.valueAsNumber;
@@ -465,7 +451,6 @@ function setExposure() {
 
 ei.addEventListener('input', setExposure);
 setExposure();
-eiControl.hidden = false;
 
 const previewButton = home.querySelector('.cover-toggle');
 const previews = [...home.querySelectorAll('.cover-preview')];
@@ -508,11 +493,7 @@ for (const video of previews) {
     if (previewOpen) stopPreviews();
   });
 }
-previewButton.addEventListener('click', () => {
-  if (previewOpen) {
-    stopPreviews();
-    return;
-  }
+function startPreviews() {
   const attempt = ++playAttempt;
   previewOpen = true;
   for (const video of previews) pendingPreviews.add(video);
@@ -524,11 +505,13 @@ previewButton.addEventListener('click', () => {
       if (attempt === playAttempt) stopPreviews();
     });
   }
+}
+
+previewButton.addEventListener('click', () => {
+  if (previewOpen) stopPreviews();
+  else startPreviews();
 });
 previewButton.hidden = false;
-document.addEventListener('visibilitychange', () => {
-  if (document.hidden && previewOpen) stopPreviews();
-});
 
 const folders = [...document.querySelectorAll('.folder-view')];
 const projects = [...document.querySelectorAll('.detail')];
@@ -538,26 +521,68 @@ const navLinks = [...document.querySelectorAll('.site-nav a')];
 const layout = document.querySelector('.folder-layout');
 const projectLists = [...document.querySelectorAll('.project-list')];
 
+
 const root = document.documentElement;
 const landing = document.querySelector('.landing');
-const landingFilm = landing.querySelector('video');
-const landingLink = landing.querySelector('.landing-enter');
-const portal = document.querySelector('.word-portal');
-const portalSvg = portal.querySelector('svg');
-const portalWord = portal.querySelector('.portal-outline');
+const [landingFilm, victorFilm] = landing.querySelectorAll('video');
 const motionPreference = matchMedia('(prefers-reduced-motion: reduce)');
-
 const clamp = (value) => Math.max(0, Math.min(1, value));
 const smooth = (t) => t * t * (3 - 2 * t);
-let entering = false;
-let opening = false;
 
-function playLanding() {
-  if (landing.hidden || landingFilm.ended) return;
-  landingFilm.play().catch(() => {
-    // The poster and Work link remain usable when autoplay is unavailable.
+let activeFilm = landingFilm;
+let opening = false;
+let workVisible = false;
+let framePending = false;
+
+function loadFilm(film) {
+  if (!film.hasAttribute('src')) film.src = film.dataset.source;
+}
+
+landingFilm.addEventListener('timeupdate', () => {
+  if (landingFilm.duration - landingFilm.currentTime <= 4) loadFilm(victorFilm);
+});
+landingFilm.addEventListener('ended', () => {
+  loadFilm(victorFilm);
+  activeFilm = victorFilm;
+  victorFilm.hidden = false;
+  landingFilm.hidden = true;
+  syncViewport();
+});
+
+function syncViewport() {
+  const viewportHeight = window.innerHeight;
+  const introVisible = !landing.hidden && landing.getBoundingClientRect().bottom > viewportHeight * .46;
+  const showPlayer = introVisible && !opening && !document.hidden;
+  if (showPlayer && !activeFilm.ended) {
+    loadFilm(activeFilm);
+    if (activeFilm.paused) activeFilm.play().catch(() => {});
+  } else {
+    activeFilm.pause();
+  }
+
+  eiControl.hidden = introVisible || opening;
+  const isWorkVisible = !home.hidden && !document.hidden
+    && home.getBoundingClientRect().top < viewportHeight * .85;
+  if (isWorkVisible !== workVisible) {
+    workVisible = isWorkVisible;
+    if (workVisible && !previewOpen) startPreviews();
+    else if (!workVisible && previewOpen) stopPreviews();
+  }
+}
+
+function queueViewportSync() {
+  if (framePending) return;
+  framePending = true;
+  requestAnimationFrame(() => {
+    framePending = false;
+    syncViewport();
   });
 }
+
+window.addEventListener('scroll', queueViewportSync, { passive: true });
+window.addEventListener('resize', queueViewportSync);
+document.addEventListener('visibilitychange', syncViewport);
+
 
 function openIris() {
   const loader = document.querySelector('.iris-loader');
@@ -565,21 +590,21 @@ function openIris() {
   const ctx = canvas.getContext('2d');
   if (!ctx) return;
 
-  const count = 6;
-  const step = 2 * Math.PI / count;
+  const blades = 6;
+  const step = 2 * Math.PI / blades;
   const start = performance.now();
   let release;
   opening = true;
   loader.hidden = false;
-  exposureView.inert = true;
+  landing.inert = exposureView.inert = true;
   root.setAttribute('data-iris-loading', '');
 
   function finish() {
     opening = false;
     root.removeAttribute('data-iris-loading');
-    exposureView.inert = false;
+    landing.inert = exposureView.inert = false;
     loader.hidden = true;
-    playLanding();
+    syncViewport();
   }
 
   function tick(now) {
@@ -588,104 +613,136 @@ function openIris() {
       return;
     }
     const elapsed = now - start;
-    if (release === undefined && elapsed >= 620 && (landingFilm.readyState >= 2 || elapsed >= 1250)) {
+    if (release === undefined && elapsed >= 475 && (landingFilm.readyState >= 2 || elapsed >= 800)) {
       release = now;
       if (landingFilm.readyState >= 2) landingFilm.removeAttribute('poster');
     }
 
-    const assemble = clamp(elapsed / 600);
-    const open = release === undefined ? 0 : clamp((now - release) / 790);
-    if (open >= 1) {
+    const assembly = clamp(elapsed / 455);
+    const openingTime = release === undefined ? 0 : clamp((now - release) / 425);
+    if (openingTime === 1) {
       finish();
       return;
     }
-
-    const w = loader.clientWidth;
-    const h = loader.clientHeight;
+    const width = loader.clientWidth;
+    const height = loader.clientHeight;
     const dpr = Math.min(devicePixelRatio || 1, 2);
-    const pixelWidth = Math.max(1, Math.round(w * dpr));
-    const pixelHeight = Math.max(1, Math.round(h * dpr));
+    const pixelWidth = Math.max(1, Math.round(width * dpr));
+    const pixelHeight = Math.max(1, Math.round(height * dpr));
     if (canvas.width !== pixelWidth || canvas.height !== pixelHeight) {
       canvas.width = pixelWidth;
       canvas.height = pixelHeight;
     }
 
-    const baseScale = Math.min(0.79, w / 440);
-    const finalScale = Math.max(1, Math.hypot(w, h) * .62 / (50 * baseScale));
-    const scale = baseScale * finalScale ** (clamp((open - .19) / .81) ** 1.73);
-    const spin = -1.50 * (1 - smooth(assemble)) + .34 * smooth(open);
-    const swing = (8 + 54 * smooth(clamp(open / .76))) * Math.PI / 180;
-    const pivotAngle = -Math.PI / 2;
-    const normal = pivotAngle + Math.PI / 2 - swing;
+    const base = Math.min(1.08, width / 350);
+    const finalScale = Math.max(1, Math.hypot(width, height) * .67 / (50 * base));
+    const push = clamp((openingTime - .16) / .84);
+    const scale = base * finalScale ** (push ** 1.60);
+    const swing = (9 + 54 * smooth(clamp(openingTime / .64))) * Math.PI / 180;
+    const spin = -.72 * (1 - smooth(assembly)) + .18 * smooth(openingTime);
     const radius = 57 * Math.sin(swing) / Math.cos(step / 2);
-    const corners = Array.from({ length: count }, (_, i) => [
-      radius * Math.cos(normal + (i - .5) * step),
-      radius * Math.sin(normal + (i - .5) * step)
-    ]);
+    const corners = Array.from({ length: blades }, (_, index) => {
+      const angle = -swing + (index - .5) * step;
+      return [radius * Math.cos(angle), radius * Math.sin(angle)];
+    });
 
-    function openingPath() {
+    function cutOpening() {
       ctx.moveTo(...corners[0]);
       for (const corner of corners.slice(1)) ctx.lineTo(...corner);
       ctx.closePath();
     }
 
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    ctx.clearRect(0, 0, w, h);
+    ctx.clearRect(0, 0, width, height);
     ctx.fillStyle = '#000';
-    ctx.fillRect(0, 0, w, h);
-    ctx.translate(w / 2, h / 2);
-    ctx.rotate(spin);
+    ctx.fillRect(0, 0, width, height);
+    ctx.translate(width / 2, height / 2);
     ctx.scale(scale, scale);
+    ctx.rotate(spin);
+
+    // Hard highlights along the housing and blade edges shift as the leaves rotate.
+    const steel = ctx.createLinearGradient(-66, -49, 55, 65);
+    steel.addColorStop(0, '#424b50');
+    steel.addColorStop(.28, '#dce9ec');
+    steel.addColorStop(.36, '#5b6871');
+    steel.addColorStop(.65, '#162126');
+    steel.addColorStop(.85, '#9da8ad');
+    steel.addColorStop(1, '#2f363a');
+    ctx.save();
+    ctx.globalAlpha = smooth(clamp((assembly - .23) / .6));
+    ctx.strokeStyle = steel;
+    ctx.lineWidth = 4;
+    ctx.beginPath();
+    ctx.arc(0, 0, 66, 0, 2 * Math.PI);
+    ctx.stroke();
+    ctx.lineWidth = .9;
+    ctx.beginPath();
+    ctx.arc(0, 0, 62.3, 0, 2 * Math.PI);
+    ctx.stroke();
+    ctx.rotate(-spin * .7);
+    for (let notch = 0; notch < 12; ++notch) {
+      ctx.fillStyle = notch % 2 ? '#383e44' : '#b8c1c4';
+      ctx.fillRect(64.5, -.45, 2.9, .9);
+      ctx.rotate(Math.PI / 6);
+    }
+    ctx.restore();
 
     ctx.save();
     ctx.beginPath();
-    ctx.arc(0, 0, 58, 0, 2 * Math.PI);
-    openingPath();
+    ctx.arc(0, 0, 60, 0, 2 * Math.PI);
+    cutOpening();
     ctx.clip('evenodd');
-    ctx.fillStyle = '#fff';
-    for (let i = 0; i < count; ++i) {
-      const arrival = smooth(clamp((assemble - i * .055) / .68));
-      const from = normal + i * step + (.70 - .70 * arrival) * step;
-      ctx.beginPath();
-      ctx.moveTo(0, 0);
-      ctx.arc(0, 0, 61, from, from + step * arrival);
-      ctx.closePath();
-      ctx.fill();
-    }
-    for (let i = 0; i < count; ++i) {
-      const arrival = smooth(clamp((assemble - i * .055) / .68));
-      const axis = pivotAngle + i * step;
-      const x = 57 * Math.cos(axis);
-      const y = 57 * Math.sin(axis);
-      const tx = Math.cos(axis - swing);
-      const ty = Math.sin(axis - swing);
-      const [tipX, tipY] = corners[(i + 1) % count];
+    for (let index = 0; index < blades; ++index) {
+      const engagement = clamp((assembly - index * .045) / .73);
+      const travel = 1 - (1 - engagement) ** 3;
+      const snap = Math.sin(Math.PI * engagement) * .1;
+      const faceAngle = -swing + index * step;
+      const delayAngle = .84 * (1 - travel) - snap;
+      const [tipX, tipY] = corners[(index + 1) % blades];
+      const innerX = tipX * Math.cos(faceAngle) + tipY * Math.sin(faceAngle);
+      const innerY = -tipX * Math.sin(faceAngle) + tipY * Math.cos(faceAngle);
+
       ctx.save();
-      ctx.globalAlpha = arrival;
-      ctx.fillStyle = '#000';
+      ctx.rotate(faceAngle + delayAngle);
+      ctx.translate(27 * (1 - travel), 0);
+      ctx.globalAlpha = smooth(clamp(engagement * 3));
       ctx.beginPath();
-      ctx.moveTo(tipX, tipY);
-      ctx.lineTo(x - 12 * tx, y - 12 * ty);
-      ctx.quadraticCurveTo(x, y, x + 5 * tx - 5 * ty, y + 5 * ty + 5 * tx);
-      ctx.lineTo(x - 12 * tx - 1.5 * ty, y - 12 * ty + 1.5 * tx);
-      ctx.lineTo(tipX - .85 * ty, tipY + .85 * tx);
+      ctx.moveTo(innerX, innerY);
+      ctx.lineTo(53, 30);
+      ctx.quadraticCurveTo(68, 11, 64, -31);
+      ctx.lineTo(30, -26);
+      ctx.lineTo(-9, -12);
       ctx.closePath();
+
+      const reflection = 8 * Math.sin(index * step + assembly * 2 + openingTime * 3);
+      const metal = ctx.createLinearGradient(-9, -23 + reflection, 48, 35 + reflection);
+      metal.addColorStop(0, '#3f494e');
+      metal.addColorStop(.23, '#728087');
+      metal.addColorStop(.38, '#dbe2de');
+      metal.addColorStop(.43, '#f5e7cc');
+      metal.addColorStop(.49, '#829096');
+      metal.addColorStop(.72, '#323d43');
+      metal.addColorStop(1, '#777d80');
+      ctx.fillStyle = metal;
       ctx.fill();
+      ctx.strokeStyle = '#13181a';
+      ctx.lineWidth = 1.8;
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.moveTo(innerX, innerY);
+      ctx.lineTo(52, 29);
+      ctx.strokeStyle = '#dae2e0';
+      ctx.lineWidth = .6;
+      ctx.stroke();
       ctx.restore();
     }
     ctx.restore();
 
-    const ring = smooth(clamp((assemble - .55) / .45));
-    ctx.strokeStyle = 'rgba(255,255,255,' + ring + ')';
-    ctx.lineWidth = 1.05;
-    ctx.beginPath();
-    ctx.arc(0, 0, 63, 0, 2 * Math.PI);
-    ctx.stroke();
-
     if (release !== undefined) {
       ctx.globalCompositeOperation = 'destination-out';
       ctx.beginPath();
-      openingPath();
+      cutOpening();
       ctx.fill();
       ctx.globalCompositeOperation = 'source-over';
     }
@@ -695,64 +752,11 @@ function openIris() {
   tick(start);
 }
 
-landingLink.addEventListener('click', (event) => {
-  if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || motionPreference.matches) return;
-  event.preventDefault();
-  if (entering || opening) return;
-  entering = true;
-  portal.hidden = false;
-  root.setAttribute('data-entering', '');
-  eiControl.inert = true;
-  const originalLocation = location.href;
-  const initialWordFrame = portalWord.getExtentOfChar(1);
-  // Aim through the left stroke of the first o so only the picture fills the frame at the end.
-  const targetX = initialWordFrame.x + initialWordFrame.width * .18;
-  const targetY = 120;
-  const start = performance.now();
-  let showedWork = false;
-
-  function finish() {
-    portal.hidden = true;
-    root.removeAttribute('data-entering');
-    eiControl.inert = false;
-    entering = false;
-    if (showedWork && location.hash === '#work') home.focus({ preventScroll: true });
-  }
-
-  function tick(now) {
-    if (location.href !== originalLocation && (!showedWork || location.hash !== '#work')) {
-      finish();
-      return;
-    }
-    const elapsed = now - start;
-    const zoom = clamp((elapsed - 435) / 620);
-    const push = smooth(zoom);
-    const aspect = Math.max(.1, portal.clientWidth / Math.max(1, portal.clientHeight));
-    const wide = Math.max(1020, 215 * aspect);
-    const width = wide * (12 / wide) ** (zoom ** 1.6);
-    const height = width / aspect;
-    const x = 500 + (targetX - 500) * push;
-    const y = 110 + (targetY - 110) * push;
-    portalSvg.setAttribute('viewBox', [x - width / 2, y - height / 2, width, height].join(' '));
-    portal.style.opacity = String(Math.min(smooth(clamp(elapsed / 195)), 1 - smooth(clamp((elapsed - 985) / 165))));
-
-    if (elapsed >= 750 && !showedWork) {
-      showedWork = true;
-      history.pushState(null, '', '#work');
-      route();
-    }
-    if (elapsed < 1150) requestAnimationFrame(tick);
-    else finish();
-  }
-  tick(start);
-});
-
 let lastFolder;
 let initialized = false;
 function route() {
   const requested = location.hash.slice(1);
   const isLanding = !requested;
-  const wasLanding = !landing.hidden;
   const isContact = requested === 'contact';
   const directProject = projects.find(section => section.id === requested);
   const folder = folders.find(section => section.id === (directProject?.dataset.folder ?? requested));
@@ -762,21 +766,12 @@ function route() {
       entry.querySelector('video')?.pause();
     }
   }
-  landing.hidden = !isLanding;
-  document.body.toggleAttribute('data-landing', isLanding);
-  if (isLanding && !wasLanding) {
-    if (!landingFilm.hasAttribute('src')) landingFilm.src = landingFilm.dataset.source;
-    if (!initialized && !motionPreference.matches) openIris();
-    if (!opening) playLanding();
-  } else if (!isLanding && wasLanding) {
-    landingFilm.pause();
-    if (landingFilm.readyState > 0) landingFilm.currentTime = 0;
-  }
-  home.hidden = isLanding || Boolean(folder) || isContact;
-  if (home.hidden && previewOpen) stopPreviews();
+  const showsWork = !folder && !isContact;
+  landing.hidden = home.hidden = !showsWork;
+  if (!showsWork && previewOpen) stopPreviews();
   contact.hidden = !isContact;
   for (const link of navLinks) {
-    if (!isLanding && link.hash === (isContact ? '#contact' : '#work')) link.setAttribute('aria-current', 'page');
+    if (link.hash === (isContact ? '#contact' : '#work')) link.setAttribute('aria-current', 'page');
     else link.removeAttribute('aria-current');
   }
   for (const section of folders) section.hidden = section !== folder || entries.length > 0;
@@ -795,9 +790,16 @@ function route() {
     if (video && !video.hasAttribute('src')) video.src = video.dataset.source;
   }
   const target = isContact ? contact : directProject ?? entries[0] ?? folder;
-  if (initialized && !entering) (target?.querySelector('h1, h2') ?? (isLanding ? landingLink : home)).focus({preventScroll:true});
+  if (initialized) (target?.querySelector('h1, h2') ?? (isLanding ? landing : home)).focus({preventScroll:true});
   if (directProject) directProject.scrollIntoView();
+  else if (showsWork && !isLanding) exposureView.scrollIntoView();
   else window.scrollTo(0, 0);
+
+  if (!initialized && isLanding && !motionPreference.matches) {
+    loadFilm(landingFilm);
+    openIris();
+  }
+  syncViewport();
   lastFolder = folder;
   initialized = true;
 }
@@ -811,6 +813,7 @@ for (const entry of projects) {
 document.querySelector('.skip').addEventListener('click', (event) => {
   event.preventDefault();
   document.querySelector('#main').focus();
+  document.querySelector('#main').scrollIntoView();
 });
 window.addEventListener('hashchange', route);
 route();</script>
