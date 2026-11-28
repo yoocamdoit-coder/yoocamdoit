@@ -228,6 +228,35 @@ body[data-catalogue] .folder-locked::after { content: none; }
   .scroll-cue { animation: none; opacity: .64; }
 }
 
+.scroll-controls {
+  position: fixed; z-index: 4;
+  right: calc(15px + env(safe-area-inset-right));
+  bottom: calc(15px + env(safe-area-inset-bottom));
+  display: grid; padding: 2px;
+  border: 1px solid #ffffff24; border-radius: 15px;
+  background: #0b0b0bb8; box-shadow: 0 5px 20px #0005;
+  backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+}
+.scroll-controls button {
+  display: grid; place-items: center;
+  width: 36px; height: 36px; padding: 0;
+  border: 0; border-radius: 11px; background: transparent;
+  color: #eee; cursor: pointer;
+}
+.scroll-controls button:hover:not(:disabled) { background: #ffffff1c; }
+.scroll-controls button:focus-visible { outline-offset: -3px; }
+.scroll-controls button:disabled { color: #fff5; cursor: default; }
+.scroll-controls button::before {
+  content: ""; display: block; width: 8px; height: 8px;
+  border: solid currentColor; border-width: 1px 1px 0 0;
+  transform: translateY(2px) rotate(-45deg);
+}
+.scroll-controls button[data-scroll-bottom]::before { transform: translateY(-2px) rotate(135deg); }
+@media (max-width: 520px) {
+  .site-nav a { padding-inline: 7px; }
+  .scroll-controls { right: calc(10px + env(safe-area-inset-right)); bottom: calc(10px + env(safe-area-inset-bottom)); }
+}
+
 .archive-gap {
   min-height: clamp(225px, 54svh, 570px);
   background: linear-gradient(to bottom, #0005, #000d 34%, #000d 67%, #0008);
@@ -276,6 +305,7 @@ body[data-catalogue] .folder-locked::after { content: none; }
   <nav class="site-nav" aria-label="Main navigation">
     <a href="#work" aria-current="page">Work</a>
     <a href="#contact">Contact</a>
+    <a href="#archive">ALL</a>
   </nav>
   <p class="site-byline">Gwanyeol Yoo, Seoul based Director of Photography</p>
 </header>
@@ -475,6 +505,10 @@ body[data-catalogue] .folder-locked::after { content: none; }
   <div class="archive"></div>
 </section>
 </main>
+<div class="scroll-controls" role="group" aria-label="Page scrolling" hidden>
+  <button type="button" data-scroll-top aria-label="Scroll to top" title="Scroll to top"></button>
+  <button type="button" data-scroll-bottom aria-label="Scroll to bottom" title="Scroll to bottom"></button>
+</div>
 <script>const home = document.querySelector('.home');
 const siteContent = document.querySelector('.site-content');
 
@@ -544,6 +578,22 @@ const projects = [...document.querySelectorAll('.detail')];
 const back = document.querySelector('.folder-back');
 const contact = document.querySelector('.contact-view');
 const navLinks = [...document.querySelectorAll('.site-nav a')];
+const archiveLink = navLinks.find(link => link.hash === '#archive');
+const scrollControls = document.querySelector('.scroll-controls');
+const scrollTopButton = scrollControls.querySelector('[data-scroll-top]');
+const scrollBottomButton = scrollControls.querySelector('[data-scroll-bottom]');
+const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
+
+function scrollBehavior() {
+  return reducedMotion.matches ? 'auto' : 'smooth';
+}
+
+scrollTopButton.addEventListener('click', () => {
+  window.scrollTo({ top: 0, behavior: scrollBehavior() });
+});
+scrollBottomButton.addEventListener('click', () => {
+  window.scrollTo({ top: document.documentElement.scrollHeight, behavior: scrollBehavior() });
+});
 const layout = document.querySelector('.folder-layout');
 const projectLists = [...document.querySelectorAll('.project-list')];
 
@@ -645,6 +695,16 @@ victorFilm.addEventListener('ended', () => showLandingFilm(landingFilm));
 
 function syncViewport() {
   const viewportHeight = window.innerHeight;
+  const scrollLimit = document.documentElement.scrollHeight - viewportHeight;
+  scrollControls.hidden = scrollLimit <= 2;
+  scrollTopButton.disabled = window.scrollY <= 2;
+  scrollBottomButton.disabled = scrollLimit - window.scrollY <= 2;
+  const inArchive = !archiveSection.hidden && archiveSection.getBoundingClientRect().top <= viewportHeight * .15;
+  const currentNav = !contact.hidden ? '#contact' : inArchive ? '#archive' : '#work';
+  for (const link of navLinks) {
+    if (link.hash === currentNav) link.setAttribute('aria-current', 'page');
+    else link.removeAttribute('aria-current');
+  }
   if (!landing.hidden) {
     const workTop = siteContent.getBoundingClientRect().top;
     const height = landing.offsetHeight;
@@ -687,7 +747,7 @@ document.addEventListener('visibilitychange', syncViewport);
 let lastFolder;
 let lastFilm;
 let initialized = false;
-function route() {
+function route(smoothArchive = false) {
   const requested = location.hash.slice(1);
   const isLanding = !requested;
   const isContact = requested === 'contact';
@@ -709,11 +769,6 @@ function route() {
   if (showsWork && !archive.hasChildNodes()) renderArchive();
   if (!showsWork && previewOpen) stopPreviews();
   contact.hidden = !isContact;
-  const currentNav = isContact ? '#contact' : '#work';
-  for (const link of navLinks) {
-    if (link.hash === currentNav) link.setAttribute('aria-current', 'page');
-    else link.removeAttribute('aria-current');
-  }
   for (const section of folders) section.hidden = section !== folder || entries.length > 0;
   for (const entry of projects) entry.hidden = !entries.includes(entry);
   back.hidden = !folder || Boolean(focusedFilm);
@@ -734,7 +789,7 @@ function route() {
   const focusTarget = isArchive ? archiveSection
     : (focusedFilm?.querySelector('video') ?? target?.querySelector('h1, h2') ?? (isLanding ? landing : home));
   if (initialized) focusTarget.focus({preventScroll:true});
-  if (isArchive) archiveSection.scrollIntoView();
+  if (isArchive) archiveSection.scrollIntoView({ behavior: smoothArchive ? scrollBehavior() : 'auto' });
   else if (directProject && !focusedFilm) directProject.scrollIntoView();
   else if (showsWork && !isLanding) siteContent.scrollIntoView();
   else window.scrollTo(0, 0);
@@ -756,7 +811,13 @@ document.querySelector('.skip').addEventListener('click', (event) => {
   document.querySelector('#main').focus();
   document.querySelector('#main').scrollIntoView();
 });
-window.addEventListener('hashchange', route);
+archiveLink.addEventListener('click', event => {
+  if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+  event.preventDefault();
+  if (location.hash !== '#archive') history.pushState(null, '', '#archive');
+  route(true);
+});
+window.addEventListener('hashchange', () => route());
 route();</script>
 </body>
 </html>
