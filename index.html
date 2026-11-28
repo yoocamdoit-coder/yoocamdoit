@@ -31,11 +31,13 @@ a:focus-visible, button:focus-visible { outline: 2px solid #dad7be; outline-offs
 .skip:focus { transform: none; }
 .home { width: 100%; position: relative; }
 .site-content {
-  position: relative; z-index: 1; display: flex; flex-direction: column;
+  position: relative; z-index: 1;
   min-height: 100vh; min-height: 100svh; background: var(--bg);
 }
-.site-content > .shell { flex: 1 0 auto; }
-body[data-catalogue] .shell { display: flex; flex-direction: column; }
+.catalogue-screen {
+  display: flex; flex-direction: column;
+  min-height: 100vh; min-height: 100svh;
+}
 .home { display: grid; flex: 1 0 auto; }
 .folder-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); grid-template-rows: repeat(2,minmax(0,1fr)); gap: 1px; min-height: 380px; }
 .folder-tile { display: block; min-width: 0; position: relative; isolation: isolate; overflow: hidden; background: #000; }
@@ -187,8 +189,9 @@ body[data-catalogue] .folder-locked::after { content: none; }
   .scroll-cue { animation: none; opacity: .54; }
 }
 
-.all-view { width: min(1600px, 100%); margin: 0 auto; padding: 18px clamp(12px, 3vw, 42px) 60px; }
-.all-view h1 { margin: 0 0 26px; font: 500 clamp(27px, 4vw, 44px)/1.1 var(--sans); }
+.archive-view { min-height: 100vh; min-height: 100svh; background: var(--bg); }
+.archive { width: min(1600px, 100%); margin: 0 auto; padding: clamp(32px, 5vw, 72px) clamp(12px, 3vw, 42px) 60px; }
+.archive-view:focus { outline: none; }
 .archive-year + .archive-year { margin-top: 46px; }
 .archive-year h2 {
   border-top: 1px solid var(--line); margin: 0 0 16px; padding-top: 12px;
@@ -214,17 +217,16 @@ body[data-catalogue] .folder-locked::after { content: none; }
   <video class="landing-film" poster="./media/victor-thumbnail.jpg" data-source="./media/victor.mp4" muted playsinline preload="auto" aria-label="Victor" hidden></video>
   <span class="scroll-cue" aria-hidden="true"></span>
 </section>
-<div class="site-content">
+<main id="main" class="site-content shell" tabindex="-1">
+<div class="catalogue-screen">
 <header class="masthead">
   <a class="site-name" id="site-name" href="#">yoocamdoit</a>
   <nav class="site-nav" aria-label="Main navigation">
     <a href="#work" aria-current="page">Work</a>
     <a href="#contact">Contact</a>
-    <a href="#all">All</a>
   </nav>
   <p class="site-byline">Gwanyeol Yoo, Seoul based Director of Photography</p>
 </header>
-<main id="main" class="shell" tabindex="-1">
 <section class="home" id="work" tabindex="-1" aria-label="Work">
 <nav class="folder-grid" aria-label="Work folders">
   <div class="folder-cover">
@@ -415,12 +417,11 @@ body[data-catalogue] .folder-locked::after { content: none; }
   </dl>
   <a class="contact-qr" href="https://www.instagram.com/yoocamdoit/" target="_blank" rel="noopener noreferrer"><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzNyAzNyIgc2hhcGUtcmVuZGVyaW5nPSJjcmlzcEVkZ2VzIj48cGF0aCBmaWxsPSIjZmZmIiBkPSJNMCAwaDM3djM3SDB6Ii8+PHBhdGggZmlsbD0iIzExMSIgZD0iTTQgNGgxdjFoLTF6TTUgNGgxdjFoLTF6TTYgNGgxdjFoLTF6TTcgNGgxdjFoLTF6TTggNGgxdjFoLTF6TTkgNGgxdjFoLTF6TTEwIDRoMXYxaC0xek0xMyA0aDF2MWgtMXpNMTUgNGgxdjFoLTF6TTE2IDRoMXYxaC0xek0xNyA0aDF2MWgtMXpNMTggNGgxdjFoLTF6TTE5IDRoMXYxaC0xek0yMCA0aDF2MWgtMXpNMjIgNGgxdjFoLTF6TTIzIDRoMXYxaC0xek0yNiA0aDF2MWgtMXpNMjcgNGgxdjFoLTF6TTI4IDRoMXYxaC0xek0yOSA0aDF2MWgtMXpNMzAgNGgxdjFoLTF6TTMxIDRoMXYxaC0xek0zMiA0aDF2MWgtMXpNNCA1aDF2MWgtMXpNMTAgNWgxdjFoLTF6TTEyIDVoMXYxaC0xek0xNSA1aDF2MWgtMXpNMTggNWgxdjFoLTF6TTE5IDVoMXYxaC0xek0yMyA1aDF2MWgtMXpNMjYgNWgxdjFoLTF6TTMyIDVoMXYxaC0xek00IDZoMXYxaC0xek02IDZoMXYxaC0xek03IDZoMXYxaC0xek04IDZoMXYxaC0xek0xMCA2aDF2MWgtMXpNMTMgNmgxdjFoLTF6TTE0IDZoMXYxaC0xek0yMyA2aDF2MWgtMXpNMjYgNmgxdjFoLTF6TTI4IDZoMXYxaC0xek0yOSA2aDF2MWgtMXpNMzAgNmgxdjFoLTF6TTMyIDZoMXYxaC0xek00IDdoMXYxaC0xek02IDdoMXYxaC0xek03IDdoMXYxaC0xek04IDdoMXYxaC0xek0xMCA3aDF2MWgtMXpNMTMgN2gxdjFoLTF6TTE0IDdoMXYxaC0xek0xNyA3aDF2MWgtMXpNMTkgN2gxdjFoLTF6TTIwIDdoMXYxaC0xek0yMiA3aDF2MWgtMXpNMjYgN2gxdjFoLTF6TTI4IDdoMXYxaC0xek0yOSA3aDF2MWgtMXpNMzAgN2gxdjFoLTF6TTMyIDdoMXYxaC0xek00IDhoMXYxaC0xek02IDhoMXYxaC0xek03IDhoMXYxaC0xek04IDhoMXYxaC0xek0xMCA4aDF2MWgtMXpNMTIgOGgxdjFoLTF6TTE0IDhoMXYxaC0xek0xNSA4aDF2MWgtMXpNMTcgOGgxdjFoLTF6TTE4IDhoMXYxaC0xek0xOSA4aDF2MWgtMXpNMjEgOGgxdjFoLTF6TTIyIDhoMXYxaC0xek0yMyA4aDF2MWgtMXpNMjQgOGgxdjFoLTF6TTI2IDhoMXYxaC0xek0yOCA4aDF2MWgtMXpNMjkgOGgxdjFoLTF6TTMwIDhoMXYxaC0xek0zMiA4aDF2MWgtMXpNNCA5aDF2MWgtMXpNMTAgOWgxdjFoLTF6TTE1IDloMXYxaC0xek0xNiA5aDF2MWgtMXpNMTggOWgxdjFoLTF6TTE5IDloMXYxaC0xek0yMCA5aDF2MWgtMXpNMjIgOWgxdjFoLTF6TTIzIDloMXYxaC0xek0yNCA5aDF2MWgtMXpNMjYgOWgxdjFoLTF6TTMyIDloMXYxaC0xek00IDEwaDF2MWgtMXpNNSAxMGgxdjFoLTF6TTYgMTBoMXYxaC0xek03IDEwaDF2MWgtMXpNOCAxMGgxdjFoLTF6TTkgMTBoMXYxaC0xek0xMCAxMGgxdjFoLTF6TTEyIDEwaDF2MWgtMXpNMTQgMTBoMXYxaC0xek0xNiAxMGgxdjFoLTF6TTE4IDEwaDF2MWgtMXpNMjAgMTBoMXYxaC0xek0yMiAxMGgxdjFoLTF6TTI0IDEwaDF2MWgtMXpNMjYgMTBoMXYxaC0xek0yNyAxMGgxdjFoLTF6TTI4IDEwaDF2MWgtMXpNMjkgMTBoMXYxaC0xek0zMCAxMGgxdjFoLTF6TTMxIDEwaDF2MWgtMXpNMzIgMTBoMXYxaC0xek0xNiAxMWgxdjFoLTF6TTE5IDExaDF2MWgtMXpNMjEgMTFoMXYxaC0xek0yMiAxMWgxdjFoLTF6TTIzIDExaDF2MWgtMXpNMjQgMTFoMXYxaC0xek00IDEyaDF2MWgtMXpNNiAxMmgxdjFoLTF6TTggMTJoMXYxaC0xek0xMCAxMmgxdjFoLTF6TTE1IDEyaDF2MWgtMXpNMTkgMTJoMXYxaC0xek0yMCAxMmgxdjFoLTF6TTIxIDEyaDF2MWgtMXpNMjMgMTJoMXYxaC0xek0yNCAxMmgxdjFoLTF6TTI4IDEyaDF2MWgtMXpNMzEgMTJoMXYxaC0xek02IDEzaDF2MWgtMXpNNyAxM2gxdjFoLTF6TTggMTNoMXYxaC0xek0xNCAxM2gxdjFoLTF6TTE3IDEzaDF2MWgtMXpNMjAgMTNoMXYxaC0xek0yNCAxM2gxdjFoLTF6TTI1IDEzaDF2MWgtMXpNMjYgMTNoMXYxaC0xek0yOSAxM2gxdjFoLTF6TTMyIDEzaDF2MWgtMXpNNyAxNGgxdjFoLTF6TTggMTRoMXYxaC0xek0xMCAxNGgxdjFoLTF6TTExIDE0aDF2MWgtMXpNMTMgMTRoMXYxaC0xek0xNSAxNGgxdjFoLTF6TTE4IDE0aDF2MWgtMXpNMzAgMTRoMXYxaC0xek0zMSAxNGgxdjFoLTF6TTMyIDE0aDF2MWgtMXpNNCAxNWgxdjFoLTF6TTkgMTVoMXYxaC0xek0xMiAxNWgxdjFoLTF6TTEzIDE1aDF2MWgtMXpNMTQgMTVoMXYxaC0xek0xNSAxNWgxdjFoLTF6TTE2IDE1aDF2MWgtMXpNMTcgMTVoMXYxaC0xek0xOCAxNWgxdjFoLTF6TTIwIDE1aDF2MWgtMXpNMjEgMTVoMXYxaC0xek0yMiAxNWgxdjFoLTF6TTIzIDE1aDF2MWgtMXpNMjggMTVoMXYxaC0xek0zMSAxNWgxdjFoLTF6TTYgMTZoMXYxaC0xek03IDE2aDF2MWgtMXpNOCAxNmgxdjFoLTF6TTkgMTZoMXYxaC0xek0xMCAxNmgxdjFoLTF6TTExIDE2aDF2MWgtMXpNMTIgMTZoMXYxaC0xek0xNCAxNmgxdjFoLTF6TTE2IDE2aDF2MWgtMXpNMTggMTZoMXYxaC0xek0xOSAxNmgxdjFoLTF6TTIwIDE2aDF2MWgtMXpNMjEgMTZoMXYxaC0xek0yMiAxNmgxdjFoLTF6TTI0IDE2aDF2MWgtMXpNMjUgMTZoMXYxaC0xek0yNiAxNmgxdjFoLTF6TTI5IDE2aDF2MWgtMXpNMzEgMTZoMXYxaC0xek0zMiAxNmgxdjFoLTF6TTQgMTdoMXYxaC0xek02IDE3aDF2MWgtMXpNOCAxN2gxdjFoLTF6TTExIDE3aDF2MWgtMXpNMTIgMTdoMXYxaC0xek0xNCAxN2gxdjFoLTF6TTE1IDE3aDF2MWgtMXpNMTYgMTdoMXYxaC0xek0xOCAxN2gxdjFoLTF6TTIwIDE3aDF2MWgtMXpNMjQgMTdoMXYxaC0xek0yNSAxN2gxdjFoLTF6TTI2IDE3aDF2MWgtMXpNMjcgMTdoMXYxaC0xek0yOSAxN2gxdjFoLTF6TTMyIDE3aDF2MWgtMXpNNSAxOGgxdjFoLTF6TTYgMThoMXYxaC0xek0xMCAxOGgxdjFoLTF6TTEzIDE4aDF2MWgtMXpNMTQgMThoMXYxaC0xek0xNSAxOGgxdjFoLTF6TTE2IDE4aDF2MWgtMXpNMTcgMThoMXYxaC0xek0yMCAxOGgxdjFoLTF6TTIxIDE4aDF2MWgtMXpNMjQgMThoMXYxaC0xek0yNSAxOGgxdjFoLTF6TTI3IDE4aDF2MWgtMXpNMjkgMThoMXYxaC0xek0zMSAxOGgxdjFoLTF6TTMyIDE4aDF2MWgtMXpNNSAxOWgxdjFoLTF6TTcgMTloMXYxaC0xek04IDE5aDF2MWgtMXpNMTEgMTloMXYxaC0xek0xMiAxOWgxdjFoLTF6TTEzIDE5aDF2MWgtMXpNMTYgMTloMXYxaC0xek0xOSAxOWgxdjFoLTF6TTIwIDE5aDF2MWgtMXpNMjEgMTloMXYxaC0xek0yMiAxOWgxdjFoLTF6TTI1IDE5aDF2MWgtMXpNMjYgMTloMXYxaC0xek0yOSAxOWgxdjFoLTF6TTMxIDE5aDF2MWgtMXpNNiAyMGgxdjFoLTF6TTggMjBoMXYxaC0xek05IDIwaDF2MWgtMXpNMTAgMjBoMXYxaC0xek0xMSAyMGgxdjFoLTF6TTEzIDIwaDF2MWgtMXpNMTQgMjBoMXYxaC0xek0yMCAyMGgxdjFoLTF6TTIxIDIwaDF2MWgtMXpNMjUgMjBoMXYxaC0xek0yNiAyMGgxdjFoLTF6TTI3IDIwaDF2MWgtMXpNMjkgMjBoMXYxaC0xek0zMSAyMGgxdjFoLTF6TTMyIDIwaDF2MWgtMXpNNSAyMWgxdjFoLTF6TTEzIDIxaDF2MWgtMXpNMTQgMjFoMXYxaC0xek0xNSAyMWgxdjFoLTF6TTE3IDIxaDF2MWgtMXpNMjAgMjFoMXYxaC0xek0yMiAyMWgxdjFoLTF6TTI0IDIxaDF2MWgtMXpNMjYgMjFoMXYxaC0xek0yOSAyMWgxdjFoLTF6TTMwIDIxaDF2MWgtMXpNMzIgMjFoMXYxaC0xek00IDIyaDF2MWgtMXpNNyAyMmgxdjFoLTF6TTggMjJoMXYxaC0xek0xMCAyMmgxdjFoLTF6TTExIDIyaDF2MWgtMXpNMTUgMjJoMXYxaC0xek0xNiAyMmgxdjFoLTF6TTE4IDIyaDF2MWgtMXpNMjIgMjJoMXYxaC0xek0yNiAyMmgxdjFoLTF6TTI3IDIyaDF2MWgtMXpNMzEgMjJoMXYxaC0xek0zMiAyMmgxdjFoLTF6TTUgMjNoMXYxaC0xek02IDIzaDF2MWgtMXpNNyAyM2gxdjFoLTF6TTggMjNoMXYxaC0xek05IDIzaDF2MWgtMXpNMTEgMjNoMXYxaC0xek0xMyAyM2gxdjFoLTF6TTE0IDIzaDF2MWgtMXpNMTUgMjNoMXYxaC0xek0xNyAyM2gxdjFoLTF6TTE4IDIzaDF2MWgtMXpNMTkgMjNoMXYxaC0xek0yMCAyM2gxdjFoLTF6TTIxIDIzaDF2MWgtMXpNMjIgMjNoMXYxaC0xek0yNCAyM2gxdjFoLTF6TTI2IDIzaDF2MWgtMXpNMjkgMjNoMXYxaC0xek0zMSAyM2gxdjFoLTF6TTQgMjRoMXYxaC0xek02IDI0aDF2MWgtMXpNMTAgMjRoMXYxaC0xek0xMiAyNGgxdjFoLTF6TTE2IDI0aDF2MWgtMXpNMTggMjRoMXYxaC0xek0xOSAyNGgxdjFoLTF6TTIwIDI0aDF2MWgtMXpNMjEgMjRoMXYxaC0xek0yNCAyNGgxdjFoLTF6TTI1IDI0aDF2MWgtMXpNMjYgMjRoMXYxaC0xek0yNyAyNGgxdjFoLTF6TTI4IDI0aDF2MWgtMXpNMTIgMjVoMXYxaC0xek0xMyAyNWgxdjFoLTF6TTE0IDI1aDF2MWgtMXpNMTggMjVoMXYxaC0xek0yMCAyNWgxdjFoLTF6TTIzIDI1aDF2MWgtMXpNMjQgMjVoMXYxaC0xek0yOCAyNWgxdjFoLTF6TTMwIDI1aDF2MWgtMXpNMzEgMjVoMXYxaC0xek0zMiAyNWgxdjFoLTF6TTQgMjZoMXYxaC0xek01IDI2aDF2MWgtMXpNNiAyNmgxdjFoLTF6TTcgMjZoMXYxaC0xek04IDI2aDF2MWgtMXpNOSAyNmgxdjFoLTF6TTEwIDI2aDF2MWgtMXpNMTUgMjZoMXYxaC0xek0xNiAyNmgxdjFoLTF6TTE3IDI2aDF2MWgtMXpNMjEgMjZoMXYxaC0xek0yMyAyNmgxdjFoLTF6TTI0IDI2aDF2MWgtMXpNMjYgMjZoMXYxaC0xek0yOCAyNmgxdjFoLTF6TTI5IDI2aDF2MWgtMXpNMzEgMjZoMXYxaC0xek0zMiAyNmgxdjFoLTF6TTQgMjdoMXYxaC0xek0xMCAyN2gxdjFoLTF6TTEzIDI3aDF2MWgtMXpNMTYgMjdoMXYxaC0xek0xOSAyN2gxdjFoLTF6TTIxIDI3aDF2MWgtMXpNMjIgMjdoMXYxaC0xek0yNCAyN2gxdjFoLTF6TTI4IDI3aDF2MWgtMXpNMjkgMjdoMXYxaC0xek00IDI4aDF2MWgtMXpNNiAyOGgxdjFoLTF6TTcgMjhoMXYxaC0xek04IDI4aDF2MWgtMXpNMTAgMjhoMXYxaC0xek0xMiAyOGgxdjFoLTF6TTE0IDI4aDF2MWgtMXpNMTYgMjhoMXYxaC0xek0yMCAyOGgxdjFoLTF6TTIxIDI4aDF2MWgtMXpNMjQgMjhoMXYxaC0xek0yNSAyOGgxdjFoLTF6TTI2IDI4aDF2MWgtMXpNMjcgMjhoMXYxaC0xek0yOCAyOGgxdjFoLTF6TTMxIDI4aDF2MWgtMXpNMzIgMjhoMXYxaC0xek00IDI5aDF2MWgtMXpNNiAyOWgxdjFoLTF6TTcgMjloMXYxaC0xek04IDI5aDF2MWgtMXpNMTAgMjloMXYxaC0xek0xMyAyOWgxdjFoLTF6TTE1IDI5aDF2MWgtMXpNMTcgMjloMXYxaC0xek0yMCAyOWgxdjFoLTF6TTI4IDI5aDF2MWgtMXpNMzAgMjloMXYxaC0xek0zMSAyOWgxdjFoLTF6TTMyIDI5aDF2MWgtMXpNNCAzMGgxdjFoLTF6TTYgMzBoMXYxaC0xek03IDMwaDF2MWgtMXpNOCAzMGgxdjFoLTF6TTEwIDMwaDF2MWgtMXpNMTIgMzBoMXYxaC0xek0xNCAzMGgxdjFoLTF6TTIxIDMwaDF2MWgtMXpNMjQgMzBoMXYxaC0xek0yNSAzMGgxdjFoLTF6TTI3IDMwaDF2MWgtMXpNMjggMzBoMXYxaC0xek0yOSAzMGgxdjFoLTF6TTMyIDMwaDF2MWgtMXpNNCAzMWgxdjFoLTF6TTEwIDMxaDF2MWgtMXpNMTMgMzFoMXYxaC0xek0xNCAzMWgxdjFoLTF6TTE1IDMxaDF2MWgtMXpNMTYgMzFoMXYxaC0xek0xNyAzMWgxdjFoLTF6TTE4IDMxaDF2MWgtMXpNMjEgMzFoMXYxaC0xek0yMiAzMWgxdjFoLTF6TTIzIDMxaDF2MWgtMXpNMjQgMzFoMXYxaC0xek0yOCAzMWgxdjFoLTF6TTMxIDMxaDF2MWgtMXpNNCAzMmgxdjFoLTF6TTUgMzJoMXYxaC0xek02IDMyaDF2MWgtMXpNNyAzMmgxdjFoLTF6TTggMzJoMXYxaC0xek05IDMyaDF2MWgtMXpNMTAgMzJoMXYxaC0xek0xMiAzMmgxdjFoLTF6TTEzIDMyaDF2MWgtMXpNMTcgMzJoMXYxaC0xek0xOCAzMmgxdjFoLTF6TTIwIDMyaDF2MWgtMXpNMjEgMzJoMXYxaC0xek0yMyAzMmgxdjFoLTF6TTI0IDMyaDF2MWgtMXpNMjYgMzJoMXYxaC0xek0yNyAzMmgxdjFoLTF6TTI4IDMyaDF2MWgtMXpNMjkgMzJoMXYxaC0xek0zMSAzMmgxdjFoLTF6TTMyIDMyaDF2MWgtMXoiLz48L3N2Zz4=" width="120" height="120" alt="Scan to open Instagram @yoocamdoit"></a>
 </section>
-<section class="all-view" id="all" aria-labelledby="all-title" hidden>
-  <h1 id="all-title" tabindex="-1">All</h1>
+</div>
+<section class="archive-view" id="archive" tabindex="-1" aria-label="Project archive" hidden>
   <div class="archive"></div>
 </section>
 </main>
-</div>
 <script>const home = document.querySelector('.home');
 const siteContent = document.querySelector('.site-content');
 
@@ -493,8 +494,8 @@ const navLinks = [...document.querySelectorAll('.site-nav a')];
 const layout = document.querySelector('.folder-layout');
 const projectLists = [...document.querySelectorAll('.project-list')];
 
-const allPage = document.querySelector('.all-view');
-const archive = allPage.querySelector('.archive');
+const archiveSection = document.querySelector('.archive-view');
+const archive = archiveSection.querySelector('.archive');
 const projectYears = new Map(folders.map(folder => [folder.id, folder.dataset.year]));
 const projectsByYear = new Map();
 for (const project of projects) {
@@ -570,15 +571,17 @@ function syncViewport() {
     landing.toggleAttribute('data-scrolled', reveal > .05);
   }
 
-  if (!landing.hidden && !document.hidden && !activeFilm.ended) {
+  if (!landing.hidden && archiveSection.getBoundingClientRect().top > 0
+    && !document.hidden && !activeFilm.ended) {
     loadFilm(activeFilm);
     if (activeFilm.paused) activeFilm.play().catch(() => {});
   } else {
     activeFilm.pause();
   }
 
+  const workBounds = home.getBoundingClientRect();
   const isWorkVisible = !home.hidden && !document.hidden
-    && home.getBoundingClientRect().top < viewportHeight * .85;
+    && workBounds.bottom > 0 && workBounds.top < viewportHeight * .85;
   if (isWorkVisible !== workVisible) {
     workVisible = isWorkVisible;
     if (workVisible && !previewOpen) startPreviews();
@@ -606,7 +609,7 @@ function route() {
   const requested = location.hash.slice(1);
   const isLanding = !requested;
   const isContact = requested === 'contact';
-  const isAll = requested === 'all';
+  const isArchive = requested === 'archive' || requested === 'all';
   const directProject = projects.find(section => section.id === requested);
   const folder = folders.find(section => section.id === (directProject?.dataset.folder ?? requested));
   const entries = projects.filter(project => project.dataset.folder === folder?.id);
@@ -615,14 +618,14 @@ function route() {
       entry.querySelector('video')?.pause();
     }
   }
-  const showsWork = !folder && !isContact && !isAll;
+  const showsWork = !folder && !isContact;
   landing.hidden = home.hidden = !showsWork;
   document.body.toggleAttribute('data-catalogue', showsWork);
-  allPage.hidden = !isAll;
-  if (isAll && !archive.hasChildNodes()) renderArchive();
+  archiveSection.hidden = !showsWork;
+  if (showsWork && !archive.hasChildNodes()) renderArchive();
   if (!showsWork && previewOpen) stopPreviews();
   contact.hidden = !isContact;
-  const currentNav = isAll ? '#all' : isContact ? '#contact' : '#work';
+  const currentNav = isContact ? '#contact' : '#work';
   for (const link of navLinks) {
     if (link.hash === currentNav) link.setAttribute('aria-current', 'page');
     else link.removeAttribute('aria-current');
@@ -642,9 +645,11 @@ function route() {
     const video = entry.querySelector('video[data-source]');
     if (video && !video.hasAttribute('src')) video.src = video.dataset.source;
   }
-  const target = isAll ? allPage : isContact ? contact : directProject ?? entries[0] ?? folder;
-  if (initialized) (target?.querySelector('h1, h2') ?? (isLanding ? landing : home)).focus({preventScroll:true});
-  if (directProject) directProject.scrollIntoView();
+  const target = isContact ? contact : directProject ?? entries[0] ?? folder;
+  const focusTarget = isArchive ? archiveSection : target?.querySelector('h1, h2') ?? (isLanding ? landing : home);
+  if (initialized) focusTarget.focus({preventScroll:true});
+  if (isArchive) archiveSection.scrollIntoView();
+  else if (directProject) directProject.scrollIntoView();
   else if (showsWork && !isLanding) siteContent.scrollIntoView();
   else window.scrollTo(0, 0);
 
