@@ -207,6 +207,9 @@ body[data-catalogue] .folder-locked::after { content: none; }
 .archive-grid a:hover .archive-title { text-decoration: underline; text-underline-offset: 4px; }
 .archive-grid img { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; object-fit: cover; }
 .archive-title { display: block; margin-top: 8px; overflow-wrap: anywhere; }
+.folder-layout[data-film-view] { display: block; }
+.folder-layout[data-film-view] .project-sidebar,
+.folder-layout[data-film-view] .detail > :not(.player, .credits) { display: none; }
 @media (max-width: 680px) { .archive-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 </style>
 </head>
@@ -521,7 +524,13 @@ function renderArchive() {
       const link = document.createElement('a');
       const thumb = document.createElement('img');
       const title = document.createElement('span');
-      link.href = '#' + project.id;
+      link.href = '#film/' + project.id;
+      link.addEventListener('click', (event) => {
+        if (event.button === 0 && !event.metaKey && !event.ctrlKey && !event.shiftKey && !event.altKey
+          && location.hash !== '#archive') {
+          history.replaceState(history.state, '', '#archive');
+        }
+      });
       thumb.src = project.querySelector('video').getAttribute('poster');
       thumb.alt = '';
       thumb.loading = 'lazy';
@@ -604,16 +613,19 @@ document.addEventListener('visibilitychange', syncViewport);
 
 
 let lastFolder;
+let lastFilm;
 let initialized = false;
 function route() {
   const requested = location.hash.slice(1);
   const isLanding = !requested;
   const isContact = requested === 'contact';
   const isArchive = requested === 'archive' || requested === 'all';
-  const directProject = projects.find(section => section.id === requested);
+  const filmId = requested.startsWith('film/') ? requested.slice(5) : null;
+  const focusedFilm = projects.find(section => section.id === filmId);
+  const directProject = focusedFilm ?? projects.find(section => section.id === requested);
   const folder = folders.find(section => section.id === (directProject?.dataset.folder ?? requested));
-  const entries = projects.filter(project => project.dataset.folder === folder?.id);
-  if (initialized && lastFolder !== folder) {
+  const entries = focusedFilm ? [focusedFilm] : projects.filter(project => project.dataset.folder === folder?.id);
+  if (initialized && (lastFolder !== folder || lastFilm !== focusedFilm)) {
     for (const entry of projects) {
       entry.querySelector('video')?.pause();
     }
@@ -632,8 +644,9 @@ function route() {
   }
   for (const section of folders) section.hidden = section !== folder || entries.length > 0;
   for (const entry of projects) entry.hidden = !entries.includes(entry);
-  back.hidden = !folder;
+  back.hidden = !folder || Boolean(focusedFilm);
   layout.hidden = entries.length === 0;
+  layout.toggleAttribute('data-film-view', Boolean(focusedFilm));
   for (const list of projectLists) {
     list.hidden = list.dataset.folder !== folder?.id;
     for (const link of list.querySelectorAll('a')) {
@@ -646,15 +659,17 @@ function route() {
     if (video && !video.hasAttribute('src')) video.src = video.dataset.source;
   }
   const target = isContact ? contact : directProject ?? entries[0] ?? folder;
-  const focusTarget = isArchive ? archiveSection : target?.querySelector('h1, h2') ?? (isLanding ? landing : home);
+  const focusTarget = isArchive ? archiveSection
+    : (focusedFilm?.querySelector('video') ?? target?.querySelector('h1, h2') ?? (isLanding ? landing : home));
   if (initialized) focusTarget.focus({preventScroll:true});
   if (isArchive) archiveSection.scrollIntoView();
-  else if (directProject) directProject.scrollIntoView();
+  else if (directProject && !focusedFilm) directProject.scrollIntoView();
   else if (showsWork && !isLanding) siteContent.scrollIntoView();
   else window.scrollTo(0, 0);
 
   syncViewport();
   lastFolder = folder;
+  lastFilm = focusedFilm;
   initialized = true;
 }
 for (const entry of projects) {
