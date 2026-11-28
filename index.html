@@ -565,7 +565,7 @@ function syncViewport() {
   if (!landing.hidden) {
     const workTop = siteContent.getBoundingClientRect().top;
     const height = landing.offsetHeight;
-    const reveal = Math.min(1, Math.max(0, (height - workTop) / (height * .82)));
+    const reveal = Math.min(1, Math.max(0, (height - workTop) / height));
     landing.style.setProperty('--film-opacity', (1 - .48 * reveal).toFixed(3));
     landing.toggleAttribute('data-scrolled', reveal > .05);
   }
