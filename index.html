@@ -192,30 +192,23 @@ body[data-catalogue] .folder-locked::after { content: none; }
 }
 
 .all-view { width: min(1600px, 100%); margin: 0 auto; padding: 18px clamp(12px, 3vw, 42px) 60px; }
-.all-view h1 { margin: 0 0 14px; font: 500 clamp(25px, 4vw, 44px)/1.1 var(--sans); }
-.all-layout { display: grid; grid-template-columns: minmax(0, 1fr) minmax(180px, 24%); align-items: start; gap: clamp(16px, 3vw, 48px); }
-.all-layout > div { min-width: 0; }
-.all-layout video { display: block; width: 100%; aspect-ratio: 16 / 9; object-fit: contain; background: #000; }
-.all-controls { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; margin-top: 12px; }
-.all-controls h2 { margin: 0; font-size: clamp(14px, 2vw, 19px); font-weight: 550; overflow-wrap: anywhere; }
-.all-advance { display: flex; gap: 6px; }
-.all-view button {
-  background: #000; color: var(--ink); border: 1px solid #ffffff32; border-radius: 4px;
-  padding: 7px 10px; font: inherit; cursor: pointer;
+.all-view h1 { margin: 0 0 26px; font: 500 clamp(27px, 4vw, 44px)/1.1 var(--sans); }
+.archive-year + .archive-year { margin-top: 46px; }
+.archive-year h2 {
+  border-top: 1px solid var(--line); margin: 0 0 16px; padding-top: 12px;
+  color: var(--muted); font: 500 clamp(17px, 2.2vw, 25px)/1.2 var(--sans);
+  font-variant-numeric: tabular-nums;
 }
-.all-view button:hover:not(:disabled) { border-color: #fff8; }
-.all-view button:disabled { opacity: .38; cursor: default; }
-.all-list { list-style: none; margin: 0; padding: 0; }
-.all-list li { border-top: 1px solid var(--line); }
-.all-list li:last-child { border-bottom: 1px solid var(--line); }
-.all-list button {
-  display: grid; grid-template-columns: 2ch minmax(0, 1fr); gap: 14px; width: 100%;
-  border: 0; border-radius: 0; padding: 12px 8px; text-align: left;
-  color: var(--muted); overflow-wrap: anywhere;
+.archive-grid {
+  display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(18px, 3vw, 34px) clamp(10px, 1.8vw, 28px);
+  list-style: none; margin: 0; padding: 0;
 }
-.all-list button[aria-current], .all-list button:hover { color: #fff; background: #121212; }
-.all-list button span:first-child { font-variant-numeric: tabular-nums; }
-@media (max-width: 650px) { .all-layout { grid-template-columns: 1fr; } }
+.archive-grid a { display: block; color: var(--ink); font-weight: 530; }
+.archive-grid a:hover .archive-title { text-decoration: underline; text-underline-offset: 4px; }
+.archive-grid img { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; object-fit: cover; }
+.archive-title { display: block; margin-top: 8px; overflow-wrap: anywhere; }
+@media (max-width: 680px) { .archive-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 520px) { .all-link, .landing-all { font-size: 13px; padding: 4px 8px; } }
 </style>
 </head>
@@ -251,10 +244,10 @@ body[data-catalogue] .folder-locked::after { content: none; }
 </nav>
   <button type="button" class="cover-toggle" aria-controls="commercial-preview personal-preview" aria-label="Play cover previews" hidden></button>
 </section>
-<section class="folder-view" id="commercial" hidden aria-labelledby="commercial-title" data-title="2026 Commercial">
+<section class="folder-view" id="commercial" hidden aria-labelledby="commercial-title" data-title="2026 Commercial" data-year="2026">
 <h1 id="commercial-title" tabindex="-1">2026 Commercial</h1>
 </section>
-<section class="folder-view" id="personal" hidden aria-labelledby="personal-title" data-title="2026 Personal Work">
+<section class="folder-view" id="personal" hidden aria-labelledby="personal-title" data-title="2026 Personal Work" data-year="2026">
 <h1 id="personal-title" tabindex="-1">2026 Personal Work</h1>
 </section>
 <div class="folder-layout" hidden>
@@ -430,19 +423,7 @@ body[data-catalogue] .folder-locked::after { content: none; }
 </section>
 <section class="all-view" id="all" aria-labelledby="all-title" hidden>
   <h1 id="all-title" tabindex="-1">All</h1>
-  <div class="all-layout">
-    <div>
-      <video controls playsinline preload="metadata" aria-labelledby="all-film-title"></video>
-      <div class="all-controls">
-        <h2 id="all-film-title" aria-live="polite"></h2>
-        <div class="all-advance">
-          <button type="button" data-previous>Previous</button>
-          <button type="button" data-next>Next</button>
-        </div>
-      </div>
-    </div>
-    <ol class="all-list" aria-label="Film order"></ol>
-  </div>
+  <div class="archive"></div>
 </section>
 </main>
 </div>
@@ -520,55 +501,47 @@ const layout = document.querySelector('.folder-layout');
 const projectLists = [...document.querySelectorAll('.project-list')];
 
 const allPage = document.querySelector('.all-view');
-const allPlayer = allPage.querySelector('video');
-const allTitle = allPage.querySelector('#all-film-title');
-const allList = allPage.querySelector('.all-list');
-const allPrevious = allPage.querySelector('[data-previous]');
-const allNext = allPage.querySelector('[data-next]');
-const allFilms = projects.map(project => {
-  const video = project.querySelector('video[data-source]');
-  return { title: project.dataset.title, source: video.dataset.source, poster: video.getAttribute('poster') };
-});
-let allIndex = -1;
-
-const allButtons = allFilms.map((film, index) => {
-  const row = document.createElement('li');
-  const button = document.createElement('button');
-  const number = document.createElement('span');
-  const title = document.createElement('span');
-  button.type = 'button';
-  number.textContent = String(index + 1).padStart(2, '0');
-  number.setAttribute('aria-hidden', 'true');
-  title.textContent = film.title;
-  button.append(number, title);
-  button.addEventListener('click', () => selectAllFilm(index, true));
-  row.append(button);
-  allList.append(row);
-  return button;
-});
-
-function selectAllFilm(index, play) {
-  const film = allFilms[index];
-  if (!film) return;
-  if (index !== allIndex) {
-    allIndex = index;
-    allPlayer.poster = film.poster;
-    allPlayer.src = film.source;
-    allTitle.textContent = film.title;
-    allPrevious.disabled = index === 0;
-    allNext.disabled = index === allFilms.length - 1;
-    allButtons.forEach((button, position) => {
-      if (position === index) button.setAttribute('aria-current', 'true');
-      else button.removeAttribute('aria-current');
-    });
-  }
-  if (play) allPlayer.play().catch(() => {});
+const archive = allPage.querySelector('.archive');
+const projectYears = new Map(folders.map(folder => [folder.id, folder.dataset.year]));
+const projectsByYear = new Map();
+for (const project of projects) {
+  const year = projectYears.get(project.dataset.folder);
+  if (!year) continue;
+  if (!projectsByYear.has(year)) projectsByYear.set(year, []);
+  projectsByYear.get(year).push(project);
 }
-allPrevious.addEventListener('click', () => selectAllFilm(allIndex - 1, true));
-allNext.addEventListener('click', () => selectAllFilm(allIndex + 1, true));
-allPlayer.addEventListener('ended', () => selectAllFilm(allIndex + 1, true));
 
-
+function renderArchive() {
+  const years = [...projectsByYear.keys()].sort((a, b) => Number(b) - Number(a));
+  for (const year of years) {
+    const section = document.createElement('section');
+    const heading = document.createElement('h2');
+    const grid = document.createElement('ul');
+    section.className = 'archive-year';
+    heading.id = 'archive-' + year;
+    heading.textContent = year;
+    section.setAttribute('aria-labelledby', heading.id);
+    grid.className = 'archive-grid';
+    for (const project of projectsByYear.get(year)) {
+      const card = document.createElement('li');
+      const link = document.createElement('a');
+      const thumb = document.createElement('img');
+      const title = document.createElement('span');
+      link.href = '#' + project.id;
+      thumb.src = project.querySelector('video').getAttribute('poster');
+      thumb.alt = '';
+      thumb.loading = 'lazy';
+      thumb.decoding = 'async';
+      title.className = 'archive-title';
+      title.textContent = project.dataset.title;
+      link.append(thumb, title);
+      card.append(link);
+      grid.append(card);
+    }
+    section.append(heading, grid);
+    archive.append(section);
+  }
+}
 
 const landing = document.querySelector('.landing');
 const [landingFilm, victorFilm] = landing.querySelectorAll('video');
@@ -637,12 +610,11 @@ document.addEventListener('visibilitychange', syncViewport);
 
 let lastFolder;
 let initialized = false;
-function route(autoplayAll = false) {
+function route() {
   const requested = location.hash.slice(1);
   const isLanding = !requested;
   const isContact = requested === 'contact';
   const isAll = requested === 'all';
-  const wasAll = !allPage.hidden;
   const directProject = projects.find(section => section.id === requested);
   const folder = folders.find(section => section.id === (directProject?.dataset.folder ?? requested));
   const entries = projects.filter(project => project.dataset.folder === folder?.id);
@@ -655,7 +627,7 @@ function route(autoplayAll = false) {
   landing.hidden = home.hidden = !showsWork;
   document.body.toggleAttribute('data-catalogue', showsWork);
   allPage.hidden = !isAll;
-  if (!isAll) allPlayer.pause();
+  if (isAll && !archive.hasChildNodes()) renderArchive();
   if (isAll) allLink.setAttribute('aria-current', 'page');
   else allLink.removeAttribute('aria-current');
   if (!showsWork && previewOpen) stopPreviews();
@@ -686,10 +658,6 @@ function route(autoplayAll = false) {
   else window.scrollTo(0, 0);
 
   syncViewport();
-  if (isAll) {
-    if (!wasAll && allIndex === 0) allPlayer.currentTime = 0;
-    selectAllFilm(wasAll ? allIndex : 0, autoplayAll);
-  }
   lastFolder = folder;
   initialized = true;
 }
@@ -705,15 +673,7 @@ document.querySelector('.skip').addEventListener('click', (event) => {
   document.querySelector('#main').focus();
   document.querySelector('#main').scrollIntoView();
 });
-for (const link of document.querySelectorAll('a[href="#all"]')) {
-  link.addEventListener('click', event => {
-    if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
-    event.preventDefault();
-    if (location.hash !== '#all') history.pushState(null, '', '#all');
-    route(true);
-  });
-}
-window.addEventListener('hashchange', () => route());
+window.addEventListener('hashchange', route);
 route();</script>
 </body>
 </html>
