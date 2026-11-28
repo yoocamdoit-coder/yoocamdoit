@@ -236,7 +236,9 @@ body[data-catalogue] .folder-locked::after { content: none; }
   border: 1px solid #ffffff24; border-radius: 15px;
   background: #0b0b0bb8; box-shadow: 0 5px 20px #0005;
   backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+  opacity: var(--scroll-controls-opacity, 0);
 }
+.scroll-controls[inert] { visibility: hidden; }
 .scroll-controls button {
   display: grid; place-items: center;
   width: 36px; height: 36px; padding: 0;
@@ -705,13 +707,17 @@ function syncViewport() {
     if (link.hash === currentNav) link.setAttribute('aria-current', 'page');
     else link.removeAttribute('aria-current');
   }
+  let controlsOpacity = 1;
   if (!landing.hidden) {
     const workTop = siteContent.getBoundingClientRect().top;
     const height = landing.offsetHeight;
     const reveal = Math.min(1, Math.max(0, (height - workTop) / height));
     landing.style.setProperty('--film-opacity', (1 - .48 * reveal).toFixed(3));
     landing.toggleAttribute('data-scrolled', reveal > .05);
+    controlsOpacity = Math.max(0, (reveal - .5) * 2);
   }
+  scrollControls.inert = controlsOpacity === 0;
+  scrollControls.style.setProperty('--scroll-controls-opacity', controlsOpacity.toFixed(3));
 
   if (!landing.hidden && !document.hidden && !activeFilm.ended) {
     loadFilm(activeFilm);
