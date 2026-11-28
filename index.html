@@ -574,6 +574,7 @@ function archiveCard(project, genre) {
 }
 
 function renderArchive() {
+  const genreOrder = ['Teaser', 'VCR', 'Music Video', 'Dance Film'];
   const years = [...projectsByYear.keys()].sort((a, b) => Number(b) - Number(a));
   for (const year of years) {
     const section = document.createElement('section');
@@ -584,7 +585,10 @@ function renderArchive() {
     heading.textContent = year;
     section.setAttribute('aria-labelledby', heading.id);
     groups.className = 'archive-genres';
-    for (const [genre, films] of projectsByYear.get(year)) {
+    const yearGenres = projectsByYear.get(year);
+    for (const genre of new Set([...genreOrder, ...yearGenres.keys()])) {
+      const films = yearGenres.get(genre);
+      if (!films) continue;
       const group = document.createElement('section');
       const label = document.createElement('h3');
       const grid = document.createElement('ul');
